@@ -1,0 +1,35 @@
+<div class="playlist-container" *ngIf="playlist">
+  <header class="playlist-header">
+    <picture class="playlist-image-container">
+      <img [src]="playlist.cover" [alt]="'Cover of ' + playlist.title" class="playlist-image" />
+    </picture>
+    <div class="playlist-info">
+      <h1 class="playlist-title">{{ playlist.title }}</h1>
+      <h2 class="playlist-artists">{{ playlist.artists.join(', ') }}</h2>
+      <p class="playlist-song-count">
+        {{ playListSongs.length }} canciones, 3 h aproximadamente
+      </p>
+    </div>
+  </header>
+
+  <div class="play-button">
+    <button class="btn-play">Play</button>
+  </div>
+
+  <section class="songs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Canción</th>
+          <th>Duración</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let song of playListSongs">
+          <td>{{ song.title }}</td>
+          <td>{{ song.duration }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

@@ -1,0 +1,24 @@
+<article class="playlist-card">
+  <div class="playlist-card-button-play">
+    <app-card-playlist-button></app-card-playlist-button>
+  </div>
+  <a
+    [routerLink]="['/playlist', id]"
+    (click)="onCardClick()"
+    class="playlist-item"
+  >
+    <picture class="playlist-image-container">
+      <img
+        [src]="cover"
+        [alt]="'Cover of ' + title + ' by ' + artistsString"
+        class="playlist-image"
+      />
+    </picture>
+
+    <div class="playlist-content">
+      <h4 class="playlist-title">{{ title }}</h4>
+      <span class="playlist-artists">{{ artistsString }}</span>
+    </div>
+  </a>
+</article>
+

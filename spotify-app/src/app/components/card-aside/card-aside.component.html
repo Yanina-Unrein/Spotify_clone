@@ -1,0 +1,16 @@
+<a
+  [routerLink]="['/playlist', playlist.id]"
+  class="playlist-item"
+>
+  <picture>
+    <img
+      [src]="playlist.cover"
+      [alt]="'Cover of ' + playlist.title + ' by ' + artistsString"
+    />
+  </picture>
+
+  <div class="flex-auto">
+    <h4>{{ playlist.title }}</h4>
+    <span>{{ artistsString }}</span>
+  </div>
+</a>

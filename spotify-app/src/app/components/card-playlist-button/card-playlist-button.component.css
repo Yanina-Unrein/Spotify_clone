@@ -1,0 +1,21 @@
+.card-play-button { /* Color verde similar a tu SVG */
+    border: none;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s, background-color 0.3s;
+    background: none;
+  }
+  
+  .card-play-button:hover {/* Cambio de color al pasar el mouse */
+    transform: scale(1.05); /* Efecto de escala al pasar el mouse */
+  }
+  
+  
+  /* Tamaño del icono grande */
+  .icon {
+    width: 70px;
+    height: 70px;
+  }

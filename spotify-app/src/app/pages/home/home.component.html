@@ -1,0 +1,20 @@
+<div id="app" class="container">
+    <aside class="aside">
+       <app-aside-menu></app-aside-menu>
+    </aside>
+
+    <main class="main">
+      <div class="playlist-gradient"></div>
+      <div *ngIf="!selectedCard">
+        <app-playlist-container (cardClick)="onCardClick($event)"></app-playlist-container>
+      </div>
+
+      <div *ngIf="selectedCard">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <app-player></app-player>
+    </footer>
+  </div>

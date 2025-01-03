@@ -1,0 +1,11 @@
+<div class="spotify__home-container_side-bar">
+    <ul class="side-bar__list">
+        <app-aside-item-menu></app-aside-item-menu>
+    </ul>
+</div>
+<div class="spotify__home-container_side-bar library">
+    <app-aside-library-item></app-aside-library-item>
+    <div class="spotify__side-bar__card-container" >
+        <app-card-aside *ngFor="let playlist of playlists" [playlist]="playlist"></app-card-aside>
+    </div>
+</div>

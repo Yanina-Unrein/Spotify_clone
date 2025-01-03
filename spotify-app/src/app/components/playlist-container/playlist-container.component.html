@@ -1,0 +1,6 @@
+<div class="playlist-container">
+    <app-greeting></app-greeting>
+    <div class="card-playlist-container" >
+        <app-card-play-list (cardClick)="onCardClick($event)" *ngFor="let playlist of playlists" [playlist]="playlist"></app-card-play-list>
+    </div>
+</div>

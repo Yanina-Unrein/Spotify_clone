@@ -1,0 +1,55 @@
+.playlist-item {
+    display: flex;
+    position: relative;
+    padding: 0.5rem; /* p-2 */
+    overflow: hidden;
+    align-items: center;
+    gap: 1.25rem; /* gap-5 */
+    background-color: #27272a;
+    transition: background-color 0.3s ease; /* Para el hover */
+    text-decoration: none;
+  }
+  
+  .playlist-item:hover {
+    background-color: #2d2d2d; /* bg-zinc-800 */
+  }
+  
+  /* Estilo para el contenedor de la imagen */
+  .playlist-item picture {
+    height: 3rem; /* h-12 */
+    width: 3rem; /* w-12 */
+    flex-shrink: 0;
+    background-color: inherit;  
+  }
+  
+  /* Estilo para la imagen */
+  .playlist-item img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: 0.375rem; /* rounded-md */
+    background-color: inherit;  
+  }
+  
+  /* Estilo para el contenedor de texto */
+  .playlist-item .flex-auto {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Para truncar el texto */
+    background-color: inherit;  
+  }
+  
+  /* Estilo para el título */
+  .playlist-item h4 {
+    color: white;
+    font-size: 0.875rem; /* text-sm */
+    margin: 0;
+    background-color: inherit;  
+  }
+  
+  /* Estilo para el texto del artista */
+  .playlist-item span {
+    color: #9ca3af; /* text-gray-400 */
+    font-size: 0.75rem; /* text-xs */
+    background-color: inherit;  
+  }

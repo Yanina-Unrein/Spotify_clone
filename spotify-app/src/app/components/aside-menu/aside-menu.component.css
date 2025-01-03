@@ -1,0 +1,32 @@
+.spotify__home-container_side-bar {
+    background-color: #27272a; 
+    border-radius: 0.5rem; 
+    padding: 0.5rem;  
+    display: block; 
+    width: 100%; 
+    overflow: hidden;  
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    box-sizing: border-box; 
+  }
+  
+
+  .side-bar__list {
+    background-color: #27272a; 
+    margin: 0;  
+    padding: 0;  
+    list-style: none;  
+    display: block;  
+    width: 100%;  
+  }
+  
+.library{
+  margin-top: 10px;
+}
+
+div.spotify__side-bar__card-container{
+  display: flex;
+  flex-direction: column;
+  background-color: #27272a;
+}
+

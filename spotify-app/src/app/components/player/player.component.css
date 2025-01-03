@@ -1,0 +1,24 @@
+.player-container{
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    z-index: 50;
+}
+
+.player-reproductor-container{
+    display: grid;
+    place-content: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.player-reproductor-button-play{
+    display: flex;
+    justify-content: center;
+}
+
+.player-volume-container{
+    display: grid;
+    place-content: center;
+}
+

@@ -1,0 +1,14 @@
+<div class="player-reproductor-button-play">
+  <button 
+    (click)="onClick()" 
+    (mouseover)="isHovered = true" 
+    (mouseleave)="isHovered = false">
+    <!-- Imagen para el botón Play cuando no está en reproducción -->
+    <img *ngIf="!isPlaying && !isHovered" [src]="'/icons/Play.svg'" alt="Play" />
+    <img *ngIf="!isPlaying && isHovered" [src]="'/icons/Play_Hover.svg'" alt="Play Hover" />
+    
+    <!-- Imagen para el botón Pause cuando está en reproducción -->
+    <img *ngIf="isPlaying && !isHovered" [src]="'/icons/Pause.svg'" alt="Pause" />
+    <img *ngIf="isPlaying && isHovered" [src]="'/icons/Pause_Hover.svg'" alt="Pause Hover" />
+  </button>
+</div>

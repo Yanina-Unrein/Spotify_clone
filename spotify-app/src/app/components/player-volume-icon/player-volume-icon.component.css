@@ -1,0 +1,11 @@
+#volume-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+#volume-icon img {
+  width: 24px;
+  height: 24px;
+}
