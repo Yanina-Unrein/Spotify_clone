@@ -1,9 +1,8 @@
-<button (click)="handleClick()" class="card-play-button">
-    <!-- Mostrar el icono según el estado de reproducción -->
-    <ng-container *ngIf="isPlaying; else playIcon">
-      <img src="/icons/Pause_Greem_Hover.svg" class="icon" alt="Pause" />
-    </ng-container>
-    <ng-template #playIcon>
-      <img src="/icons/Play_Greem_Hover.svg" class="icon" alt="Play" />
-    </ng-template>
+<button  (click)="handleClick()" class="card-play-button">
+  <ng-container *ngIf="isPlaying; else playIcon">
+    <img src="/icons/Pause_Greem_Hover.svg" class="icon" alt="Pause" />
+  </ng-container>
+  <ng-template #playIcon>
+    <img src="/icons/Play_Greem_Hover.svg" class="icon" alt="Play" />
+  </ng-template>
 </button>

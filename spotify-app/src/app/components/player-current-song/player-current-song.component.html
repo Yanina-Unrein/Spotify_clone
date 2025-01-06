@@ -1,0 +1,11 @@
+<div class="player-current-song">
+    <ng-container *ngIf="image">
+      <picture class="song-image">
+        <img [src]="image" [alt]="title" />
+      </picture>
+    </ng-container>
+    <div class="song-info">
+      <h3 class="song-title">{{ title }}</h3>
+      <span class="song-artists">{{ artists?.join(', ') }}</span>
+    </div>
+  </div>

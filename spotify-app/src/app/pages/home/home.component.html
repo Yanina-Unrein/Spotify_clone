@@ -5,13 +5,7 @@
 
     <main class="main">
       <div class="playlist-gradient"></div>
-      <div *ngIf="!selectedCard">
-        <app-playlist-container (cardClick)="onCardClick($event)"></app-playlist-container>
-      </div>
-
-      <div *ngIf="selectedCard">
-        <router-outlet></router-outlet>
-      </div>
+      <router-outlet></router-outlet>
     </main>
 
     <footer class="footer">

@@ -9,8 +9,8 @@
     background: none;
   }
   
-  .card-play-button:hover {/* Cambio de color al pasar el mouse */
-    transform: scale(1.05); /* Efecto de escala al pasar el mouse */
+  .card-play-button:hover {
+    transform: scale(1.05); 
   }
   
   

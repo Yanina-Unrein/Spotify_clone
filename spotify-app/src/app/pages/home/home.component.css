@@ -6,8 +6,8 @@
         "aside main"
         "player player"; 
     height: 100vh; 
-    padding: 5px;
-    gap: 8px; 
+    gap: 5px;
+    overflow: hidden;
   }
   
   .aside {
@@ -15,31 +15,56 @@
     overflow-y: auto; 
     display: flex;
     flex-direction: column; 
+    height: 100%;
   }
   
   .main {
     grid-area: main;
     position: relative;
-    background-color: #1f1f1f; 
     border-radius: 8px;
     overflow-y: auto; 
     transition: all 1s;
     background-color: #16a34a;
+    height: 100%;
   }
+
   .playlist-gradient {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, #18181b, rgba(24, 24, 27, 0.8));
+    background: linear-gradient(to top, rgba(24, 24, 27, 0.8) 60%, transparent);
     z-index: 0; 
     border-radius: 8px;
+    height: 100vh;
+    
 }
 
-div[ng-reflect-animations] {
-  transition: all 0.3s ease-in-out;
-}
+  div[ng-reflect-animations] {
+    transition: all 0.3s ease-in-out;
+  }
   
   .footer {
     grid-area: player;
-    height: 80px; 
     background-color: #121212; 
+    width: 100%;
+  }
+
+
+  .main {
+    transition: opacity 0.4s ease-in-out;
+  }
+  
+  .main.ng-enter {
+    opacity: 0;
+  }
+  
+  .main.ng-enter-active {
+    opacity: 1;
+  }
+  
+  .main.ng-leave {
+    opacity: 1;
+  }
+  
+  .main.ng-leave-active {
+    opacity: 0;
   }

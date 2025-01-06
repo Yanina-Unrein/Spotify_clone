@@ -2,11 +2,12 @@ import { allPlaylists, playlists, songs } from '@/app/lib/data';
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { CardPlaylistButtonComponent } from "../../../components/card-playlist-button/card-playlist-button.component";
 
 
 @Component({
   selector: 'app-play-list-detail',
-  imports: [CommonModule],
+  imports: [CommonModule, CardPlaylistButtonComponent],
   templateUrl: './play-list-detail.component.html',
   styleUrl: './play-list-detail.component.css'
 })

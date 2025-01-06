@@ -1,6 +1,25 @@
 <div class="playlist-container">
     <app-greeting></app-greeting>
-    <div class="card-playlist-container" >
-        <app-card-play-list (cardClick)="onCardClick($event)" *ngFor="let playlist of playlists" [playlist]="playlist"></app-card-play-list>
+    <div class="card-section-container">
+        <h2>Tus Artistas</h2>
+        <div class="card-playlist-container" >
+            <div class="card-playlist-container" >
+                <app-card-artist 
+                *ngFor="let artist of artists"
+                [artist]="artist"
+                (cardClick)="onArtistSelected($event)"
+                ></app-card-artist>
+            </div>
+        </div>
+    </div>
+    <div class="card-section-container">
+        <h2>Hecho para ti</h2>
+        <div class="card-playlist-container" >
+            <app-card-play-list 
+            (cardClick)="onCardClick($event)" 
+            *ngFor="let playlist of playlists" 
+            [playlist]="playlist">
+            </app-card-play-list>
+        </div>
     </div>
 </div>

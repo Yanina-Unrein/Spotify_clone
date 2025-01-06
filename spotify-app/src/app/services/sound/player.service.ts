@@ -1,4 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Song } from '@/app/lib/data';
+import { isPlatformBrowser } from '@angular/common';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -23,11 +25,9 @@ export class PlayerService {
     return this.isPlayingSubject.value;
   }
 
-  setCurrentMusic(music: any) {
-    if (this.currentMusic?.id !== music?.id) {
-      this.currentMusicSubject.next(music);
-      this.isPlayingSubject.next(true);
-    }
+  setCurrentMusic(music: any): void {
+    this.currentMusicSubject.next(music);
+    this.isPlayingSubject.next(true); // Reproducción comienza automáticamente al cambiar de canción
   }
 
   play(music: any) {
@@ -56,5 +56,5 @@ export class PlayerService {
     } else {
       this.setVolume(0);
     }
+  } 
   }
-}

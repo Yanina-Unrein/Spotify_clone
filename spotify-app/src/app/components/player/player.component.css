@@ -18,7 +18,7 @@
 }
 
 .player-volume-container{
-    display: grid;
-    place-content: center;
+    display: flex;
+    align-items: center;
 }
 

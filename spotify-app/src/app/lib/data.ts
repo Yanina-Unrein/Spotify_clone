@@ -319,3 +319,172 @@ export const songs: Song[] = [
     "duration": "2:54"
   },
 ]
+
+export interface Artist {
+  id: number;
+  name: string;
+  photo: string;
+  color: (typeof colors)[keyof typeof colors];
+  songs: {
+
+    id: number;
+
+    albumId: number;
+
+    title: string;
+
+    image: string;
+
+    album: string;
+
+    duration: string;
+
+  }[];
+}
+
+export const artists = [
+  {
+    id: 1,
+    name: "LoFi Dreamer",
+    color: colors.yellow,
+    photo: "https://i.scdn.co/image/ab67616d0000b27377c5cfe70138c38b2c3de080",
+    songs: [
+      {
+        id: 1,
+        albumId: 1,
+        title: "Moonlit Walk",
+        image: "https://vinyl.lofirecords.com/cdn/shop/products/VINYL_MORNING_COFFEE_4-min.png?v=1680526353",
+        album: "Chill Lo-Fi Music",
+        duration: "2:57"
+      },
+      {
+        id: 2,
+        albumId: 1,
+        title: "Coffee Daze",
+        image: "https://vinyl.lofirecords.com/cdn/shop/products/VINYL_MORNING_COFFEE_4-min.png?v=1680526353",
+        album: "Chill Lo-Fi Music",
+        duration: "3:40"
+      },
+      {
+        id: 3,
+        albumId: 1,
+        title: "Skyline Serenade",
+        image: "https://vinyl.lofirecords.com/cdn/shop/products/VINYL_MORNING_COFFEE_4-min.png?v=1680526353",
+        album: "Chill Lo-Fi Music",
+        duration: "3:29"
+      },
+      {
+        id: 4,
+        albumId: 1,
+        title: "Urban Echoes",
+        image: "https://vinyl.lofirecords.com/cdn/shop/products/VINYL_MORNING_COFFEE_4-min.png?v=1680526353",
+        album: "Chill Lo-Fi Music",
+        duration: "2:11"
+      },
+      {
+        id: 5,
+        albumId: 1,
+        title: "Night's End",
+        image: "https://vinyl.lofirecords.com/cdn/shop/products/VINYL_MORNING_COFFEE_4-min.png?v=1680526353",
+        album: "Chill Lo-Fi Music",
+        duration: "2:26"
+      }
+    ]
+  },
+  {
+    id: 2,
+    name: "Urban Nocturne",
+    color: colors.green,
+    photo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRj4L7v35m2qTSwmPpMXqCcekal30erpTlOn5PPFbcaEkR8vKwV5d9XAhSJf9oD_pDTKeY",
+    songs: [
+      {
+        id: 1,
+        albumId: 2,
+        title: "Silent Rain",
+        image: "https://vinyl.lofirecords.com/cdn/shop/files/2amsynth-vinyl.png?v=1693312187",
+        album: "Midnight Tales",
+        duration: "2:38"
+      },
+      {
+        id: 2,
+        albumId: 2,
+        title: "Lost Pages",
+        image: "https://vinyl.lofirecords.com/cdn/shop/files/2amsynth-vinyl.png?v=1693312187",
+        album: "Midnight Tales",
+        duration: "2:40"
+      },
+      {
+        id: 3,
+        albumId: 2,
+        title: "Midnight Tales",
+        image: "https://vinyl.lofirecords.com/cdn/shop/files/2amsynth-vinyl.png?v=1693312187",
+        album: "Midnight Tales",
+        duration: "2:53"
+      },
+      {
+        id: 4,
+        albumId: 2,
+        title: "City Lights",
+        image: "https://vinyl.lofirecords.com/cdn/shop/files/2amsynth-vinyl.png?v=1693312187",
+        album: "Midnight Tales",
+        duration: "3:11"
+      },
+      {
+        id: 5,
+        albumId: 2,
+        title: "Night Drive",
+        image: "https://vinyl.lofirecords.com/cdn/shop/files/2amsynth-vinyl.png?v=1693312187",
+        album: "Midnight Tales",
+        duration: "2:58"
+      }
+    ]
+  },
+  {
+    id: 3,
+    name: "Tenno",
+    color: colors.rose,
+    photo: "https://i.scdn.co/image/ab67616d0000b273c2fb7b92f47cd0a0d227e34e",
+    songs: [
+      {
+        id: 1,
+        albumId: 3,
+        title: "Lunar",
+        image: "https://f4.bcbits.com/img/a1435058381_65.jpg",
+        album: "Study Session",
+        duration: "3:06"
+      },
+      {
+        id: 2,
+        albumId: 3,
+        title: "Go go go!",
+        image: "https://f4.bcbits.com/img/a1435058381_65.jpg",
+        album: "Study Session",
+        duration: "1:30"
+      },
+      {
+        id: 3,
+        albumId: 3,
+        title: "Keep focus!",
+        image: "https://f4.bcbits.com/img/a1435058381_65.jpg",
+        album: "Study Session",
+        duration: "1:59"
+      },
+      {
+        id: 4,
+        albumId: 3,
+        title: "JavaScript is the way",
+        image: "https://f4.bcbits.com/img/a1435058381_65.jpg",
+        album: "Study Session",
+        duration: "3:56"
+      },
+      {
+        id: 5,
+        albumId: 3,
+        title: "No more TypeScript for me",
+        image: "https://f4.bcbits.com/img/a1435058381_65.jpg",
+        album: "Study Session",
+        duration: "2:30"
+      }
+    ]
+  }
+];

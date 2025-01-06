@@ -1,7 +1,10 @@
 .playlist-container{
+    display: flex;
+    flex-direction: column;
     position: relative;
     transition: all 1s;
     padding-left: 25px;
+    height: 100vh;
 }
 
 .card-playlist-container{
@@ -11,3 +14,8 @@
     gap: 1rem;
 }
 
+.card-section-container{
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 30px;
+}

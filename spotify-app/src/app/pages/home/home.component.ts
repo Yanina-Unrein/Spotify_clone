@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { AsideMenuComponent } from "../../components/aside-menu/aside-menu.component";
-import { PlaylistContainerComponent } from "../../components/playlist-container/playlist-container.component";
 import { CommonModule } from '@angular/common';
 import { Playlist } from '@/app/lib/data';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
@@ -10,7 +9,7 @@ import { PlayerComponent } from '@/app/components/player/player.component';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, AsideMenuComponent, PlaylistContainerComponent,  RouterOutlet, PlayerComponent],
+  imports: [CommonModule, AsideMenuComponent, RouterOutlet, PlayerComponent],
   templateUrl: './home.component.html',
   standalone: true,
   styleUrl: './home.component.css'

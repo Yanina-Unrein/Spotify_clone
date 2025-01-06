@@ -11,9 +11,14 @@ import { Subscription } from 'rxjs';
   styleUrl: './button-player.component.css'
 })
 export class ButtonPlayerComponent implements OnInit, OnDestroy {
+ 
   @Input() music: any;
+  
   isPlaying: boolean = false;
-  isHovered: boolean = false;
+  isHoveredPrev: boolean = false;
+  isHoveredNext: boolean = false;
+  isHoveredPlay: boolean = false;
+
   private subscription = new Subscription();
 
   constructor(private playerService: PlayerService) {}
@@ -26,11 +31,19 @@ export class ButtonPlayerComponent implements OnInit, OnDestroy {
     );
   }
 
+  onPrevSong() {
+    console.log('Prev song');
+  }
+
+  onNextSong() {
+    console.log('Next song');
+  }
+
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
 
   onClick(): void {
     this.playerService.togglePlay();
-  }
+  }  
 }
