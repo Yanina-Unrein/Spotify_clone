@@ -1,0 +1,19 @@
+.btn-add{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-add img{
+    padding: 0;
+    margin: 0;
+}
+
+.btn-add:hover{
+    background: #141414;
+    border-radius: 100%;
+    padding: 10px;
+}

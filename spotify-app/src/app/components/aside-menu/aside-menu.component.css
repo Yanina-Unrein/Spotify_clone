@@ -4,26 +4,30 @@
     padding: 0.5rem;  
     display: block; 
     width: 100%; 
+    height: 100%;
     overflow: hidden;  
     overflow-y: auto; 
     overflow-x: hidden; 
     box-sizing: border-box; 
-  }
+}
+
+.btn-container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
   
 
-  .side-bar__list {
+.side-bar__list {
     background-color: #27272a; 
     margin: 0;  
     padding: 0;  
     list-style: none;  
     display: block;  
     width: 100%;  
-  }
-  
-.library{
-  margin-top: 10px;
-  height: 100%;
+    height: 100%;
 }
+  
 
 div.spotify__side-bar__card-container{
   display: flex;

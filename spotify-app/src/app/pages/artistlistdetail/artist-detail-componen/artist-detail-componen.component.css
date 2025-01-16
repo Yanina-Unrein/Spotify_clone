@@ -144,3 +144,34 @@
  .title-artist-container h3, span{
     margin: 0;
  }
+
+ .song-row {
+  position: relative;
+}
+
+.order-cell {
+  position: relative;
+  width: 50px;
+  text-align: center;
+}
+
+.number-column {
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+.play-card-button{
+  position: absolute;
+  top: 50%;
+  left: 30%;
+  transform: translateY(1rem); 
+  opacity: 0;
+  transition: all 0.5s ease;
+  z-index: 10; 
+  background: #ffffff;
+}
+
+.song-row .play-card-button:hover {
+  transform: translateY(0); 
+  opacity: 1; 
+}

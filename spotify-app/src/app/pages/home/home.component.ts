@@ -2,14 +2,15 @@ import { Component } from '@angular/core';
 import { AsideMenuComponent } from "../../components/aside-menu/aside-menu.component";
 import { CommonModule } from '@angular/common';
 import { Playlist } from '@/app/lib/data';
-import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { PlayerComponent } from '@/app/components/player/player.component';
+import { MenuTopComponent } from "../../components/menu-top/menu-top.component";
 
 
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, AsideMenuComponent, RouterOutlet, PlayerComponent],
+  imports: [RouterModule, CommonModule, AsideMenuComponent, RouterOutlet, PlayerComponent, MenuTopComponent],
   templateUrl: './home.component.html',
   standalone: true,
   styleUrl: './home.component.css'

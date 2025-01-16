@@ -1,3 +1,9 @@
+.playlist-card{
+  position: relative;
+  background-color: #27272a;
+  transition: background-color 0.3s ease; /* Para el hover */
+}
+
 .playlist-item {
     display: flex;
     position: relative;
@@ -5,13 +11,26 @@
     overflow: hidden;
     align-items: center;
     gap: 1.25rem; /* gap-5 */
-    background-color: #27272a;
-    transition: background-color 0.3s ease; /* Para el hover */
     text-decoration: none;
   }
   
   .playlist-item:hover {
     background-color: #2d2d2d; /* bg-zinc-800 */
+  }
+
+  .play-card-button{
+    position: absolute;
+    right: 19rem; 
+    bottom: 2rem; 
+    transform: translateY(1rem); 
+    transition: all 0.5s ease; 
+    opacity: 0;
+    z-index: 10; 
+  }
+  
+  .play-card-button:hover {
+    transform: translateY(0); 
+    opacity: 1; 
   }
   
   /* Estilo para el contenedor de la imagen */

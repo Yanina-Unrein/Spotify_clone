@@ -4,12 +4,13 @@ import { AsideItemMenuComponent } from "../aside-item-menu/aside-item-menu.compo
 import { AsideLibraryItemComponent } from "../aside-library-item/aside-library-item.component";
 import { Playlist, playlists } from '@/app/lib/data';
 import { CardAsideComponent } from '../card-aside/card-aside.component';
+import { BtnAddComponent } from "../btn-add/btn-add.component";
 
 
 
 @Component({
   selector: 'app-aside-menu',
-  imports: [CommonModule, AsideItemMenuComponent, AsideLibraryItemComponent, CardAsideComponent],
+  imports: [CommonModule, AsideItemMenuComponent, AsideLibraryItemComponent, CardAsideComponent, BtnAddComponent],
   templateUrl: './aside-menu.component.html',
   styleUrl: './aside-menu.component.css'
 })

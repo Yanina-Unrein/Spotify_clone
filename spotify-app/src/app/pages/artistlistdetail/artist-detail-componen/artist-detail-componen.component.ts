@@ -1,18 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CardPlaylistButtonComponent } from "../../../components/card-playlist-button/card-playlist-button.component";
-import { Artist, artists, songs } from '@/app/lib/data';
+import { Artist, artists, Playlist, songs } from '@/app/lib/data';
+import { ButtonPlaySmallComponent } from "../../../components/button-play-small/button-play-small.component";
 
 @Component({
   selector: 'app-artist-detail-componen',
-  imports: [CommonModule, CardPlaylistButtonComponent],
+  imports: [CommonModule, CardPlaylistButtonComponent, ButtonPlaySmallComponent],
   templateUrl: './artist-detail-componen.component.html',
   styleUrl: './artist-detail-componen.component.css'
 })
 export class ArtistDetailComponenComponent implements OnInit {
   artist: Artist | null = null; // Almacena el artista seleccionado
   artistSongs: any[] = []; // Almacena las canciones del artista
+  @Input() playlist!: Playlist;
 
   constructor(private route: ActivatedRoute) {}
 
@@ -35,5 +37,12 @@ export class ArtistDetailComponenComponent implements OnInit {
         console.error('Artista no encontrado');
       }
     }
+  }
+
+  isPlaying: boolean = false; // Estado de reproducción
+
+  togglePlay() {
+    this.isPlaying = !this.isPlaying;
+    // Aquí puedes agregar lógica adicional para controlar la reproducción de música
   }
 }

@@ -1,0 +1,8 @@
+<button class="play-button" (click)="handleClick()">
+  <ng-container *ngIf="isPlaying; else playIcon">
+    <img src="/icons/Pause_small.svg" alt="Pause" />
+  </ng-container>
+  <ng-template #playIcon>
+    <img src="/icons/Play_small.svg" alt="Play" />
+  </ng-template>
+</button>

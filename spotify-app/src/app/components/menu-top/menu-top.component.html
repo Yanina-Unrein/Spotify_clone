@@ -1,1 +1,20 @@
-<p>menu-top works!</p>
+<nav>
+    <div class="logo-container">
+        <a  [routerLink]="['']" class="logo-link">
+            <img src="/Spotify-Icon-Logo.svg" alt="icono de Spotify">
+        </a>
+    </div>
+    <div class="second-container">
+        <div>
+            <a [routerLink]="['']" class="icon-home"><img src="/icons/Home.svg" alt="icono de casa"></a>
+        </div>
+        <div class="search-container"> 
+            <img src="/icons/Search.svg" alt="icono de lupa" class="search-icon">
+            <input type="search" placeholder="¿Qué quieres reproducir?">
+        </div>
+    </div>
+    <div class="user-container">
+        <a class="sing-up-link" href="">Registrarse</a>
+        <a class="log-in-link" href="">Iniciar sesión</a>
+    </div>
+</nav>

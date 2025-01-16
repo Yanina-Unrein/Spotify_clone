@@ -37,8 +37,15 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let song of artistSongs; let i = index">
-            <td>{{ i + 1 }}</td>
+          <tr *ngFor="let song of artistSongs; let i = index" class="song-row">
+            <td class="order-cell">
+              <div class="order-container">
+                <span class="song-number">{{ i + 1 }}</span>
+            <div class="play-card-button">
+              <app-button-play-small [music]="playlist"></app-button-play-small>
+            </div>
+          </div>
+        </td>
             <td class="title-container">
               <picture>
                 <img 

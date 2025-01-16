@@ -1,16 +1,18 @@
-<a
-  [routerLink]="['/playlist', playlist.id]"
-  class="playlist-item"
->
-  <picture>
-    <img
-      [src]="playlist.cover"
-      [alt]="'Cover of ' + playlist.title + ' by ' + artistsString"
-    />
-  </picture>
-
-  <div class="flex-auto">
-    <h4>{{ playlist.title }}</h4>
-    <span>{{ artistsString }}</span>
+<article class="playlist-card">
+  <div class="play-card-button">
+    <app-button-play-small [music]="playlist"></app-button-play-small>
   </div>
-</a>
+  <a [routerLink]="['/playlist', playlist.id]" class="playlist-item">
+    <picture>
+      <img
+        [src]="playlist.cover"
+        [alt]="'Cover of ' + playlist.title + ' by ' + artistsString"
+      />
+    </picture>
+
+    <div class="flex-auto">
+      <h4>{{ playlist.title }}</h4>
+      <span>{{ artistsString }}</span>
+    </div>
+  </a>
+</article>

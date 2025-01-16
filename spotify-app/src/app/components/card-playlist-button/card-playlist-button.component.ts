@@ -1,5 +1,3 @@
-import { Song } from '@/app/lib/data';
-import { ApiServicesService } from '@/app/services/apiServices/api-services.service';
 import { PlayerService } from '@/app/services/sound/player.service';
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
@@ -12,7 +10,7 @@ import { combineLatest, map, Subscription } from 'rxjs';
   styleUrl: './card-playlist-button.component.css'
 })
 export class CardPlaylistButtonComponent implements OnInit, OnDestroy {
-   @Input() music: any;
+  @Input() music: any;
   isPlaying: boolean = false;
   private subscription = new Subscription();
 
