@@ -1,4 +1,4 @@
-import { PlayerService } from '@/app/services/sound/player.service';
+import { PlayerService } from '@/app/services/player/player.service';
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { combineLatest, map, Subscription } from 'rxjs';
@@ -19,10 +19,10 @@ export class CardPlaylistButtonComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscription.add(
       combineLatest([
-        this.playerService.currentMusic$,  
-        this.playerService.isPlaying$    
+        this.playerService.currentMusic$,
+        this.playerService.isPlaying$
       ]).subscribe(([currentMusic, isPlaying]) => {
-        this.isPlaying = currentMusic?.id === this.music?.id && isPlaying;
+        this.isPlaying = !!currentMusic && this.music?.id === currentMusic?.id && isPlaying;
       })
     );
   }
@@ -32,10 +32,19 @@ export class CardPlaylistButtonComponent implements OnInit, OnDestroy {
   }
 
   handleClick() {
-    if (this.music?.id !== this.playerService.currentMusic?.id) {
-      this.playerService.play(this.music);
-    } else {
-      this.playerService.togglePlay();
-    }
-  } 
+  console.log('Reproduciendo música:', this.music);
+  if (!this.music?.url) {
+    console.error('La URL de la música no está definida');
+    return;
+  }
+
+  if (this.music?.id !== this.playerService.currentMusic?.id) {
+    // Reproducir la canción seleccionada
+    this.playerService.play(this.music);
+  } else {
+    // Alternar entre Play/Pause
+    this.playerService.togglePlay();
+  }
 }
+}
+

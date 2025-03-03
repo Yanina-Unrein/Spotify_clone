@@ -1,6 +1,6 @@
-import { PlayerService } from '@/app/services/sound/player.service';
+import { PlayerService } from '@/app/services/player/player.service';
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit} from '@angular/core';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -31,19 +31,23 @@ export class ButtonPlayerComponent implements OnInit, OnDestroy {
     );
   }
 
-  onPrevSong() {
-    console.log('Prev song');
-  }
-
-  onNextSong() {
-    console.log('Next song');
-  }
-
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
 
   onClick(): void {
-    this.playerService.togglePlay();
-  }  
+    if (!this.music || (this.playerService.currentMusic && this.music.id !== this.playerService.currentMusic.id)) {
+      this.playerService.play(this.music);
+    } else {
+      this.playerService.togglePlay();
+    }
+  }
+
+  onPrevSong(): void {
+    this.playerService.previousTrack();
+  }
+
+  onNextSong(): void {
+    this.playerService.nextTrack();
+  }
 }

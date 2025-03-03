@@ -1,5 +1,11 @@
 <div class="btn-add-container">
-    <button class="btn-add">
+    <button class="btn-add" (click)="showModal = true">
         <img src="/icons/Add_icon.svg" alt="icono de agregar">
     </button>
 </div>
+
+<app-modal-playlist
+    *ngIf="showModal"
+    (save)="onSavePlaylist($event)"
+    (cancel)="showModal = false">
+</app-modal-playlist>

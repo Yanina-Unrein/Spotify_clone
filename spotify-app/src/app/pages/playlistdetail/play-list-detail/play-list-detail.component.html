@@ -1,15 +1,21 @@
 <div
   id="playlist-container"
   class="playlist-container"
-  [ngStyle]="{'background': 'linear-gradient(to top, rgba(24, 24, 27, 0.8) 40%, transparent), ' + playlist?.color?.accent}"
+  [ngStyle]="{'background': 'linear-gradient(to top, rgba(24, 24, 27, 0.8) 40%, transparent), ' + playlist?.color}"
 >
   <header class="header">
     <picture class="cover">
       <img
-        [src]="playlist?.cover"
+        [src]="firstSongImage"
         [alt]="'Cover of ' + playlist?.title"
         class="cover-image"
+        *ngIf="firstSongImage"
       />
+      <div 
+        class="cover-placeholder" 
+        *ngIf="!firstSongImage"
+        [style.background-color]="playlist?.color">
+      </div>
     </picture>
 
     <div class="details">
@@ -21,11 +27,10 @@
       <div class="artist-info">
         <div class="artist-text">
           <div>
-            <span>{{ playlist?.artists.join(", ") }}</span>
+            <span>{{ playListSongs.length > 0 ? getArtistsString(playListSongs[0]) : 'Sin artistas' }}</span>
           </div>
           <p class="song-count">
-            <span class="song-count-white">{{ playListSongs.length }} canciones</span>,
-            3 h aproximadamente
+            <span class="song-count-white">{{ playListSongs.length }} canciones</span>
           </p>
         </div>
       </div>
@@ -39,7 +44,7 @@
     </picture>
   </div>
 
-  <section class="songs-table">
+  <section class="songs-table" *ngIf="playListSongs.length > 0">
     <table>
       <thead>
         <tr>
@@ -58,22 +63,22 @@
           <td class="order-cell">
             <div class="order-container">
               <span class="song-number">{{ i + 1 }}</span>
-          <div class="play-card-button">
-            <app-button-play-small [music]="playlist"></app-button-play-small>
-          </div>
-        </div>
-      </td>
+              <div class="play-card-button">
+                <app-button-play-small [music]="song"></app-button-play-small>
+              </div>
+            </div>
+          </td>
           <td class="title-container">
             <picture>
               <img 
-                [src]="playlist?.cover"
-                [alt]="'Cover of ' + playlist?.title"
+                [src]="song.image_path"
+                [alt]="'Cover of ' + song.title"
                 class="album-cover-image"
               />
             </picture>
-           <div class="title-artist-container">
+            <div class="title-artist-container">
               <h3>{{ song.title }}</h3>
-              <span> {{song.artists}}</span>
+              <span>{{ getArtistsString(song) }}</span>
             </div>
           </td> 
           <td>{{ song.album }}</td>
@@ -82,4 +87,8 @@
       </tbody>
     </table>
   </section>
+
+  <div class="empty-state" *ngIf="playListSongs.length === 0">
+    <p>Esta playlist está vacía. ¡Agrega algunas canciones!</p>
+  </div>
 </div>

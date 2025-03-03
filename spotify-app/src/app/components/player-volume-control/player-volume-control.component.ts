@@ -1,11 +1,12 @@
-import { PlayerService } from '@/app/services/sound/player.service';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms'
 import { PlayerVolumeIconComponent } from "../player-volume-icon/player-volume-icon.component";
+import { PlayerService } from '@/app/services/player/player.service';
 
 @Component({
   selector: 'app-player-volume-control',
+  standalone: true, 
   imports: [CommonModule, FormsModule, PlayerVolumeIconComponent],
   templateUrl: './player-volume-control.component.html',
   styleUrl: './player-volume-control.component.css'

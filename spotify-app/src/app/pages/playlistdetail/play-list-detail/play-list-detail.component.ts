@@ -1,9 +1,11 @@
-import { allPlaylists, Playlist, playlists, songs } from '@/app/lib/data';
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CardPlaylistButtonComponent } from "../../../components/card-playlist-button/card-playlist-button.component";
 import { ButtonPlaySmallComponent } from "../../../components/button-play-small/button-play-small.component";
+import { PlaylistService } from "../../../services/playlist/playlist.service";
+import { Artist } from '@/app/models/ArtistModel';
+import { Song } from '@/app/models/SongModel';
 
 
 @Component({
@@ -16,29 +18,23 @@ export class PlayListDetailComponent implements OnInit {
   playlist: any = null;  // Almacena la playlist seleccionada
   playListSongs: any[] = [];  // Almacena las canciones de la playlist
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private playlistService: PlaylistService) {}
 
   ngOnInit(): void {
-    const playlistId = this.route.snapshot.paramMap.get('id');  // Obtiene el ID desde la URL
-
-    console.log('Playlist ID (string):', playlistId);
-
+    const playlistId = this.route.snapshot.paramMap.get('id');
     if (playlistId) {
-      const numericPlaylistId = Number(playlistId);  // Convierte el ID a número
-      console.log('Playlist ID (número):', numericPlaylistId);
-
+      const numericPlaylistId = Number(playlistId);
       if (!isNaN(numericPlaylistId)) {
-        // Busca la playlist por su ID
-        this.playlist = playlists.find(p => p.id === numericPlaylistId.toString()) || null;
-        console.log('Playlist encontrada:', this.playlist);
-
-        if (this.playlist) {
-          // Si se encuentra la playlist, filtra las canciones
-          this.playListSongs = songs.filter(song => song.albumId === numericPlaylistId);
-          console.log('Canciones de la playlist:', this.playListSongs);
-        }
-      } else {
-        console.error('El ID de la playlist no es un número válido');
+        this.playlistService.getPlaylistById(numericPlaylistId).subscribe({
+          next: (playlist) => {
+            this.playlist = playlist;
+            this.playListSongs = playlist.songs || [];
+            console.log('Playlist encontrada:', this.playlist);
+          },
+          error: (error) => {
+            console.error('Error al cargar la playlist:', error);
+          }
+        });
       }
     }
   }
@@ -48,5 +44,13 @@ export class PlayListDetailComponent implements OnInit {
   togglePlay() {
     this.isPlaying = !this.isPlaying;
     // Aquí puedes agregar lógica adicional para controlar la reproducción de música
+  }
+
+  get firstSongImage(): string | null {
+    return this.playListSongs[0]?.image_path || null;
+  }
+
+  getArtistsString(song: Song): string {
+    return song.artists?.map(artist => artist.name).join(', ') || '';
   }
 }

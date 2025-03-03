@@ -1,4 +1,4 @@
-<button  (click)="handleClick()" class="card-play-button">
+<button (click)="handleClick()" class="card-play-button">
   <ng-container *ngIf="isPlaying; else playIcon">
     <img src="/icons/Pause_Greem_Hover.svg" class="icon" alt="Pause" />
   </ng-container>
@@ -6,3 +6,4 @@
     <img src="/icons/Play_Greem_Hover.svg" class="icon" alt="Play" />
   </ng-template>
 </button>
+

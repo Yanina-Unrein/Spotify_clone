@@ -1,64 +1,65 @@
 <div id="artist-container" class="artist-container">
-    <header class="header" [style.backgroundImage]="'url(' + artist?.photo + ')'">
-      <div class="details">
-       <div class="verified-container">
+  <header class="header" [style.backgroundImage]="'url(' + artist?.photo + ')'">
+    <div class="details">
+      <div class="verified-container">
         <picture>
           <img src="/icons/verified.svg" alt="icon verificado">
         </picture>
         <span>Artista verificado</span>
-       </div>
-        <h2 class="artist-label">Artista</h2>
-        <h1 class="artist-name">{{ artist?.name }}</h1>
       </div>
-    </header>
+      <h2 class="artist-label">Artista</h2>
+      <h1 class="artist-name">{{ artist?.name }}</h1>
+    </div>
+  </header>
 
-    <div class="play-button">
-      <app-card-playlist-button></app-card-playlist-button>
-      <button class="btn-follow">Seguir</button>
-      <picture>
-        <img src="/icons/Options.svg" alt="icon opciones">
-      </picture>
-    </div>
-    <div class="title-container">
-      <h2>Populares</h2>
-    </div>
-    <section class="songs-table">
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Título</th>
-            <th>Álbum</th>
-            <th>
-              <picture>
-                <img src="/icons/Clock.svg" alt="icono de reloj">
-              </picture>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let song of artistSongs; let i = index" class="song-row">
-            <td class="order-cell">
-              <div class="order-container">
-                <span class="song-number">{{ i + 1 }}</span>
-            <div class="play-card-button">
-              <app-button-play-small [music]="playlist"></app-button-play-small>
+  <div class="play-button">
+    <app-card-playlist-button></app-card-playlist-button>
+    <button class="btn-follow">Seguir</button>
+    <picture>
+      <img src="/icons/Options.svg" alt="icon opciones">
+    </picture>
+  </div>
+  <div class="title-container">
+    <h2>Populares</h2>
+  </div>
+  <section class="songs-table">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Título</th>
+          <th>Álbum</th>
+          <th>
+            <picture>
+              <img src="/icons/Clock.svg" alt="icono de reloj">
+            </picture>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let song of songs; let i = index" class="song-row">
+          <td class="order-cell">
+            <div class="order-container">
+              <span class="song-number">{{ i + 1 }}</span>
+              <div class="play-card-button">
+                <app-button-play-small [music]="song"></app-button-play-small>
+              </div>
             </div>
-          </div>
-        </td>
-            <td class="title-container">
-              <picture>
-                <img 
-                  [src]="song.image"
-                  [alt]="'Cover of ' + song?.title"
-                  class="album-cover-image"
-                />
-              </picture>
-              <h3>{{ song.title }}</h3>
-            </td> 
-            <td>{{ song.album }}</td>
-            <td>{{ song.duration }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+          </td>
+          <td class="title-container">
+            <picture>
+              <img 
+                [src]="song.image_path"
+                [alt]="'Cover of ' + song?.title"
+                class="album-cover-image"
+              />
+            </picture>
+            <h3>{{ song.title }}</h3>
+          </td> 
+          <td>{{ song.album }}</td>
+          <td>{{ song.duration }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

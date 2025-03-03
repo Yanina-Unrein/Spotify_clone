@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { AsideMenuComponent } from "../../components/aside-menu/aside-menu.component";
 import { CommonModule } from '@angular/common';
-import { Playlist } from '@/app/lib/data';
 import { ActivatedRoute, Router, RouterModule, RouterOutlet } from '@angular/router';
 import { PlayerComponent } from '@/app/components/player/player.component';
 import { MenuTopComponent } from "../../components/menu-top/menu-top.component";
+import { Playlist } from '@/app/models/PlaylistModel';
 
 
 

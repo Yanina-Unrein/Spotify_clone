@@ -1,0 +1,92 @@
+.song-card {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+  }
+  
+  .column {
+    display: flex;
+    justify-content: center;
+    justify-content: center;
+  }
+
+  .play-card-button-container{
+    position: relative;
+  }
+
+  .play-card-button{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(1rem); 
+    opacity: 0;
+    transition: all 0.5s ease;
+    z-index: 10; 
+    background: #ffffff;
+  }
+
+  .play-card-button-container .play-card-button:hover {
+    transform: translateY(0); 
+    opacity: 1; 
+  }
+  
+  .image-column {
+    justify-content: flex-start;
+  }
+  
+  .album-cover-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+  }
+  
+  .details-column {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .song-title {
+    font-weight: 400;
+    font-size: 1rem;
+    color: #fff;
+    margin: 0;
+  }
+  
+  .song-artists {
+    font-weight: 400;
+    font-size: 0.95rem;
+    color: #b3b3b3;
+    margin: 0;
+  }
+  
+  .duration-column {
+    justify-content: flex-start;
+  }
+  
+  .song-duration {
+    font-weight: 400;
+    font-size: 0.95rem;
+    color: #b3b3b3;
+  }
+  
+  .actions-column {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+  
+  .action-button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.3s ease;
+  }
+  
+  .action-button:hover {
+    transform: translateY(-5px);
+  }
+  

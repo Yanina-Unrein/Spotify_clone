@@ -39,6 +39,11 @@
     transition: all 0.3s ease; 
     text-decoration: none;
   }
+
+  /* Si no hay imagen, mantener el espacio */
+.playlist-item:not(:has(.playlist-image-container)) {
+  padding-top: 11rem;
+}
   
   /* Estilo para el contenedor de la imagen */
   .playlist-image-container {

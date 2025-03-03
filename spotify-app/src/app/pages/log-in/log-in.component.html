@@ -1,0 +1,65 @@
+<div class="login-container">
+  <div class="login-body"> 
+    <a [routerLink]="['/']">
+        <img class="logo" src="/Spotify-Icon-Logo.svg" alt="icono de spotify">
+      </a>
+      <h1>
+          Inicia sesión en Spotify
+      </h1>
+      <div>
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+              <div class="mb-3">
+                  <label for="email" class="form-label">Correo Electrónico</label>
+                  <input
+                  type="email"
+                  id="email"
+                  class="form-control"
+                  formControlName="email"
+                  placeholder="Ingresa tu correo"
+                  [class.invalid]="isFieldInvalid('email')"
+                  />
+                  <div *ngIf="isFieldInvalid('email') && loginForm.get('email')?.errors?.['required']" class="invalid-feedback">
+                       El correo es obligatorio.
+                  </div>
+                  <div *ngIf="isFieldInvalid('email') && loginForm.get('email')?.errors?.['email']" class="invalid-feedback">
+                    <span>&#9888; Este correo electrónico no es válido. Asegúrate de que tenga un formato como este: ejemplo&#64;email.com</span>
+                  </div>
+              </div>
+              <div class="mb-3">
+                  <label for="password" class="form-label">Contraseña</label>
+                  <input
+                  type="password"
+                  id="password"
+                  class="form-control"
+                  formControlName="password"
+                  placeholder="Ingresa tu contraseña"
+                  [class.invalid]="isFieldInvalid('password')"
+                  />
+                  <div *ngIf="isFieldInvalid('password') && loginForm.get('password')?.errors?.['required']" class="invalid-feedback">
+                      La contraseña es obligatoria.
+                  </div>
+                  <div *ngIf="isFieldInvalid('password') && loginForm.get('password')?.errors?.['minlength']" class="invalid-feedback">
+                    &#9888; La contraseña debe tener al menos 6 caracteres.
+                  </div>
+              </div>
+              <!-- Mensaje de Error General -->
+              <div *ngIf="errorMessage" class="general-error">{{ errorMessage }}</div>
+          
+              <button type="submit" [disabled]="loginForm.invalid" class="btn-login">Iniciar Sesión</button>
+          </form>
+      </div>
+      <hr class="separator">
+      <div class="footer-container">
+          <span class="login">¿No tienes cuenta?</span>
+          <a [routerLink]="['/registrarse']">Suscríbete a Spotify</a>
+      </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div *ngIf="showModal" class="modal-backdrop">
+    <div class="modal">
+      <h2>¡Bienvenido de nuevo!</h2>
+      <p>{{ validUser?.first_name }} {{ validUser?.last_name }}</p>
+    </div>
+  </div>

@@ -1,0 +1,31 @@
+<div class="song-card">
+    <div class="column image-column play-card-button-container">
+      <img 
+        [src]="song.image_path"
+        [alt]="'Cover of ' + song.title"
+        class="album-cover-image"
+      />
+      <div class="play-card-button">
+        <app-button-play-small [music]="song"></app-button-play-small>
+      </div>
+    </div>
+  
+    <div class="column details-column">
+      <h3 class="song-title">{{ song.title }}</h3>
+      <h4 class="song-artists">{{ getArtistsString(song) }}</h4>
+    </div>
+  
+    <div class="column duration-column">
+      <span class="song-duration">{{ song.duration }}</span>
+    </div>
+  
+    <div class="column actions-column">
+      <button (click)="addToPlaylist(song)" class="action-button">
+        <img src="/icons/Add_icon.svg" alt="Agregar a playlist">
+      </button>
+      <button (click)="toggleFavorite(song)" class="action-button">
+        <img *ngIf="!isFavorite" src="/icons/Heart_favorite.svg" alt="Agregar a favoritos" />
+        <img *ngIf="isFavorite" src="/icons/Heart_Fill.svg" alt="Favorito" />
+      </button>
+    </div>
+  </div>

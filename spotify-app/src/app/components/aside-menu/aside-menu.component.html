@@ -1,7 +1,7 @@
 <div class="spotify__home-container_side-bar">
     <div class="btn-container">
         <app-aside-library-item></app-aside-library-item>
-        <app-btn-add></app-btn-add>
+        <app-btn-add (createPlaylist)="createPlaylist()"></app-btn-add>
     </div>
     <div class="spotify__side-bar__card-container" >
         <app-card-aside *ngFor="let playlist of playlists" [playlist]="playlist"></app-card-aside>

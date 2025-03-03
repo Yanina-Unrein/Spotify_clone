@@ -1,0 +1,112 @@
+<div class="register-container">
+    <a [routerLink]="['/']">
+      <img class="logo" src="/Spotify-Icon-Logo.svg" alt="icono de spotify">
+    </a>
+    <h1>
+        Regístrate<br> para empezar<br> a escuchar<br> contenido
+    </h1>
+    <div>
+        <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="first_name" class="form-label">Nombre</label>
+              <input
+                type="text"
+                id="first_name"
+                class="form-control"
+                formControlName="first_name"
+                [class.is-invalid]="registrationForm.get('first_name')?.invalid && registrationForm.get('first_name')?.touched"
+              />
+              <div *ngIf="registrationForm.get('first_name')?.invalid && registrationForm.get('first_name')?.touched" class="invalid-feedback">
+                El nombre es obligatorio y debe tener al menos 2 caracteres.
+              </div>
+            </div>
+        
+            <div class="mb-3">
+              <label for="last_name" class="form-label">Apellido</label>
+              <input
+                type="text"
+                id="last_name"
+                class="form-control"
+                formControlName="last_name"
+                [class.is-invalid]="registrationForm.get('last_name')?.invalid && registrationForm.get('last_name')?.touched"
+              />
+              <div *ngIf="registrationForm.get('last_name')?.invalid && registrationForm.get('last_name')?.touched" class="invalid-feedback">
+                El apellido es obligatorio y debe tener al menos 2 caracteres.
+              </div>
+            </div>
+        
+            <div class="mb-3">
+              <label for="username" class="form-label">Nombre de Usuario</label>
+              <input
+                type="text"
+                id="username"
+                class="form-control"
+                formControlName="username"
+                [class.is-invalid]="registrationForm.get('username')?.invalid && registrationForm.get('username')?.touched"
+              />
+              <div *ngIf="registrationForm.get('username')?.invalid && registrationForm.get('username')?.touched" class="invalid-feedback">
+                El nombre de usuario es obligatorio y debe tener al menos 3 caracteres.
+              </div>
+            </div>
+        
+            <div class="mb-3">
+              <label for="email" class="form-label">Correo Electrónico</label>
+              <input
+                type="email"
+                id="email"
+                class="form-control"
+                formControlName="email"
+                [class.is-invalid]="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched"
+                />
+                <div *ngIf="registrationForm.get('email')?.hasError('required') && registrationForm.get('email')?.touched" class="invalid-feedback">
+                  El correo es obligatorio.
+                </div>
+              <div *ngIf="registrationForm.get('email')?.hasError('email') && registrationForm.get('email')?.touched" class="invalid-feedback">
+                <span>&#9888; Este correo electrónico no es válido. Asegúrate de que tenga un formato como este: ejemplo&#64;email.com</span>
+              </div>
+              <div *ngIf="registrationForm.get('email')?.hasError('emailExists') && registrationForm.get('email')?.touched" class="emailExists">
+                &#9888; Esta dirección ya está vinculada a una cuenta. Para continuar, <a [routerLink]="['login']">inicia sesión</a>.
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Contraseña</label>
+              <div class="password-container">
+                <input
+                [type]="passwordVisible ? 'text' : 'password'"
+                id="password"
+                class="form-control"
+                formControlName="password"
+                [class.is-invalid]="registrationForm.get('password')?.invalid && registrationForm.get('password')?.touched"
+              />
+              <button
+              type="button"
+              class="eye-btn"
+              (click)="togglePasswordVisibility()"
+              aria-label="Mostrar u ocultar contraseña">
+              <img *ngIf="passwordVisible" src="/icons/eye-off.svg" alt="Ocultar contraseña" />
+              <img *ngIf="!passwordVisible" src="/icons/eye-show.svg" alt="Mostrar contraseña" />
+            </button>
+              </div>
+              <div *ngIf="registrationForm.get('password')?.invalid && registrationForm.get('password')?.touched" class="invalid-feedback">
+               <p> La contraseña debe contener al menos:<br>
+                - 1 letra,<br>
+                - 1 número o carácter especial (por ejemplo, "#", "?", "!" o "&"),<br>
+                - 10 caracteres</p>
+              </div>
+            </div>
+        
+            <button type="submit" class="btn-register" [disabled]="registrationForm.invalid">Registrarse</button>
+          </form>
+    </div>
+    <hr class="separator">
+    <div class="footer-container">
+        <div class="login-container">
+          <span class="login">¿Ya tienes una cuenta?</span>
+          <a [routerLink]="['/login']">Inicia sesión aquí.</a>
+        </div>
+        <span class="privacy">
+            This site is protected by reCAPTCHA and the Google<br>
+            Privacy Policy and Terms of Service apply.
+        </span>
+    </div>
+</div>

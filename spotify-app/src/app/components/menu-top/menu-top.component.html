@@ -1,20 +1,46 @@
 <nav>
     <div class="logo-container">
-        <a  [routerLink]="['']" class="logo-link">
+        <a [routerLink]="['']" class="logo-link">
             <img src="/Spotify-Icon-Logo.svg" alt="icono de Spotify">
         </a>
     </div>
     <div class="second-container">
         <div>
-            <a [routerLink]="['']" class="icon-home"><img src="/icons/Home.svg" alt="icono de casa"></a>
+            <a [routerLink]="['']" class="icon-home">
+                <img src="/icons/Home.svg" alt="icono de casa">
+            </a>
         </div>
         <div class="search-container"> 
             <img src="/icons/Search.svg" alt="icono de lupa" class="search-icon">
-            <input type="search" placeholder="¿Qué quieres reproducir?">
+            <input type="search" placeholder="¿Qué quieres reproducir?" #searchInput (input)="onSearch(searchInput.value)">
         </div>
     </div>
     <div class="user-container">
-        <a class="sing-up-link" href="">Registrarse</a>
-        <a class="log-in-link" href="">Iniciar sesión</a>
+        <!-- Mostrar estos botones solo si NO hay usuario logueado -->
+        <ng-container *ngIf="!currentUser">
+            <a class="sing-up-link" [routerLink]="['/registrarse']">Registrarse</a>
+            <a class="log-in-link" [routerLink]="['/login']">Iniciar sesión</a>
+        </ng-container>
+
+        <!-- Mostrar el botón de usuario si hay alguien logueado -->
+        <div *ngIf="currentUser" class="user-menu-container">
+            <button class="user-button" (click)="toggleUserMenu()">
+                {{ getUserInitial() }}
+            </button>
+            
+            <!-- Menú desplegable -->
+            <div class="user-menu" *ngIf="showUserMenu">
+                <div class="user-info">
+                    <span class="user-name">{{ currentUser.first_name }} {{ currentUser.last_name }}</span>
+                    <span class="user-email">{{ currentUser.email }}</span>
+                </div>
+                <div class="menu-items">
+                    <a [routerLink]="['/perfil']" (click)="showUserMenu = false">Perfil</a>
+                    <a [routerLink]="['/favoritos']" (click)="showUserMenu = false">Favoritos</a>
+                    <a [routerLink]="['/playlists']" (click)="showUserMenu = false">Playlists</a>
+                    <button class="logout-button" (click)="logout()">Cerrar sesión</button>
+                </div>
+            </div>
+        </div>
     </div>
 </nav>

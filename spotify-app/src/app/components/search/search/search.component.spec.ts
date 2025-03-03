@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AsideItemMenuComponent } from './aside-item-menu.component';
+import { SearchComponent } from './search.component';
 
-describe('AsideItemMenuComponent', () => {
-  let component: AsideItemMenuComponent;
-  let fixture: ComponentFixture<AsideItemMenuComponent>;
+describe('SearchComponent', () => {
+  let component: SearchComponent;
+  let fixture: ComponentFixture<SearchComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AsideItemMenuComponent]
+      imports: [SearchComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AsideItemMenuComponent);
+    fixture = TestBed.createComponent(SearchComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
