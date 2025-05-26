@@ -1,11 +1,11 @@
-<div class="player-current-song">
-    <ng-container *ngIf="image">
-      <picture class="song-image">
-        <img [src]="image" [alt]="title" />
-      </picture>
-    </ng-container>
-    <div class="song-info">
-      <h3 class="song-title">{{ title }}</h3>
-      <span class="song-artists">{{ artists?.join(', ') }}</span>
-    </div>
-  </div>
+<div class="current-song-container" *ngIf="currentSong()">
+      <div class="song-image">
+        <img [src]="currentSong()?.image_path" 
+             [alt]="currentSong()?.title"
+             class="cover-image">
+      </div>
+      <div class="song-info">
+        <h3 class="song-title">{{ currentSong()?.title }}</h3>
+        <p class="song-artist">{{ artistNames() }}</p>
+      </div>
+</div>

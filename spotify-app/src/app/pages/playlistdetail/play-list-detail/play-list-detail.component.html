@@ -1,36 +1,36 @@
 <div
   id="playlist-container"
   class="playlist-container"
-  [ngStyle]="{'background': 'linear-gradient(to top, rgba(24, 24, 27, 0.8) 40%, transparent), ' + playlist?.color}"
+  [ngStyle]="{'background': gradientBackground()}"
 >
   <header class="header">
     <picture class="cover">
       <img
-        [src]="firstSongImage"
-        [alt]="'Cover of ' + playlist?.title"
+        [src]="firstSongImage()"
+        [alt]="'Cover of ' + playlist()?.title"
         class="cover-image"
-        *ngIf="firstSongImage"
+        *ngIf="firstSongImage()"
       />
       <div 
         class="cover-placeholder" 
-        *ngIf="!firstSongImage"
-        [style.background-color]="playlist?.color">
+        *ngIf="!firstSongImage()"
+        [style.background-color]="playlist()?.color">
       </div>
     </picture>
 
     <div class="details">
       <h2 class="playlist-label">Playlist</h2>
       <div>
-        <h1 class="playlist-title">{{ playlist?.title }}</h1>
+        <h1 class="playlist-title">{{ playlist()?.title }}</h1>
       </div>
 
       <div class="artist-info">
         <div class="artist-text">
           <div>
-            <span>{{ playListSongs.length > 0 ? getArtistsString(playListSongs[0]) : 'Sin artistas' }}</span>
+            <span>{{ playListSongs().length > 0 ? getArtistsString(playListSongs()[0]) : 'Sin artistas' }}</span>
           </div>
           <p class="song-count">
-            <span class="song-count-white">{{ playListSongs.length }} canciones</span>
+            <span class="song-count-white">{{ playListSongs().length }} canciones</span>
           </p>
         </div>
       </div>
@@ -38,13 +38,13 @@
   </header>
 
   <div class="play-button">
-    <app-card-playlist-button></app-card-playlist-button>
+    <app-card-playlist-button  [songs]="playListSongs()" [playlistId]="'playlist-' + (playlist()?.id || '')"></app-card-playlist-button>
     <picture>
       <img src="/icons/Options.svg" alt="icon opciones">
     </picture>
   </div>
 
-  <section class="songs-table" *ngIf="playListSongs.length > 0">
+  <section class="songs-table" *ngIf="playListSongs().length > 0">
     <table>
       <thead>
         <tr>
@@ -59,12 +59,16 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let song of playListSongs; let i = index" class="song-row">
+        <tr *ngFor="let song of playListSongs(); let i = index" class="song-row">
           <td class="order-cell">
             <div class="order-container">
               <span class="song-number">{{ i + 1 }}</span>
               <div class="play-card-button">
-                <app-button-play-small [music]="song"></app-button-play-small>
+                <app-button-play-small 
+                  [song]="song" 
+                  [playlistId]="'playlist-' + (playlist()?.id || '')"
+                  [playlistSongs]="playListSongs()">
+                </app-button-play-small>
               </div>
             </div>
           </td>
@@ -88,7 +92,11 @@
     </table>
   </section>
 
-  <div class="empty-state" *ngIf="playListSongs.length === 0">
+  <div class="empty-state" *ngIf="playListSongs().length === 0 && !isLoading()">
     <p>Esta playlist está vacía. ¡Agrega algunas canciones!</p>
+  </div>
+
+  <div class="error-message" *ngIf="error() && !isLoading()">
+    {{ error() }}
   </div>
 </div>

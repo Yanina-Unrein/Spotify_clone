@@ -1,7 +1,6 @@
 import { PlayerService } from '@/app/services/player/player.service';
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit} from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Component, inject } from '@angular/core';
 
 @Component({
   selector: 'app-button-player',
@@ -10,44 +9,49 @@ import { Subscription } from 'rxjs';
   templateUrl: './button-player.component.html',
   styleUrl: './button-player.component.css'
 })
-export class ButtonPlayerComponent implements OnInit, OnDestroy {
- 
-  @Input() music: any;
+export class ButtonPlayerComponent  {
+ playerService = inject(PlayerService);
   
-  isPlaying: boolean = false;
-  isHoveredPrev: boolean = false;
-  isHoveredNext: boolean = false;
-  isHoveredPlay: boolean = false;
+  // Estados de hover (opcional)
+  isHoveredPrev = false;
+  isHoveredPlay = false;
+  isHoveredNext = false;
+  isHoveredShuffle = false;
 
-  private subscription = new Subscription();
+  // Señales del servicio
+  currentSong = this.playerService.currentSong;
+  isPlaying = this.playerService.isPlaying;
+  currentTime = this.playerService.currentTime;
+  duration = this.playerService.duration;
+  hasNext = this.playerService.hasNext;
+  hasPrevious = this.playerService.hasPrevious;
+  isShuffled = this.playerService.isShuffled;
 
-  constructor(private playerService: PlayerService) {}
-
-  ngOnInit(): void {
-    this.subscription.add(
-      this.playerService.isPlaying$.subscribe(isPlaying => {
-        this.isPlaying = isPlaying;
-      })
-    );
+  togglePlay() {
+    this.playerService.togglePlay();
   }
 
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+  prevSong() {
+    this.playerService.previous();
   }
 
-  onClick(): void {
-    if (!this.music || (this.playerService.currentMusic && this.music.id !== this.playerService.currentMusic.id)) {
-      this.playerService.play(this.music);
-    } else {
-      this.playerService.togglePlay();
-    }
+  nextSong() {
+    this.playerService.next();
   }
 
-  onPrevSong(): void {
-    this.playerService.previousTrack();
+  toggleShuffle() {
+    this.playerService.toggleShuffle();
   }
 
-  onNextSong(): void {
-    this.playerService.nextTrack();
+  seekTo(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const newTime = parseFloat(target.value);
+    this.playerService.seekTo(newTime);
+  }
+
+  formatTime(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   }
 }

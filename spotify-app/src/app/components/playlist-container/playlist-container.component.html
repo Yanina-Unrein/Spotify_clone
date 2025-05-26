@@ -1,25 +1,46 @@
 <div class="playlist-container">
     <app-greeting></app-greeting>
+    
     <div class="card-section-container">
         <h2>Tus Artistas</h2>
-        <div class="card-playlist-container" >
-            <div class="card-playlist-container" >
+        <div class="card-playlist-container">
+            @for (artist of artists(); track artist.id) {
                 <app-card-artist 
-                *ngFor="let artist of artists"
-                [artist]="artist"
-                (cardClick)="onArtistSelected($event)"
-                ></app-card-artist>
+                    [artist]="artist"
+                    (cardClick)="onArtistSelected($event)">
+                </app-card-artist>
+            }
+        </div>
+    </div>
+
+    <div class="card-section-container" *ngIf="userPlaylists().length > 0">
+        <h2>Tus Playlists</h2>
+        <div class="card-playlist-container">
+            @for (playlist of userPlaylists(); track playlist.id) {
+                <app-card-play-list 
+                    [playlist]="playlist"
+                    (cardClick)="onCardClick($event)">
+                </app-card-play-list>
+            }
+        </div>
+    </div>
+
+    <!-- Playlists de otros usuarios -->
+    <div class="card-section-container" *ngIf="otherUsersPlaylists().length > 0">
+        <h2>Playlists de la comunidad</h2>
+        @if (otherUsersPlaylists().length > 0) {
+            <div class="card-playlist-container">
+                @for (playlist of otherUsersPlaylists(); track playlist.id) {
+                    <app-card-play-list 
+                        [playlist]="playlist"
+                        (cardClick)="onCardClick($event)">
+                    </app-card-play-list>
+                }
             </div>
-        </div>
+        }
     </div>
-    <div class="card-section-container">
-        <h2>Hecho para ti</h2>
-        <div class="card-playlist-container" >
-            <app-card-play-list 
-            (cardClick)="onCardClick($event)" 
-            *ngFor="let playlist of playlists" 
-            [playlist]="playlist">
-            </app-card-play-list>
-        </div>
-    </div>
+
+    @if (userPlaylists().length === 0 && otherUsersPlaylists().length === 0) {
+    <p class="empty-message">No hay playlists disponibles</p>
+  }
 </div>

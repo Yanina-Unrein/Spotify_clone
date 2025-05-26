@@ -1,34 +1,35 @@
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '@/environments/environment';
+import { map, Observable } from 'rxjs';
 import { Artist } from '@/app/models/ArtistModel';
 import { Song } from '@/app/models/SongModel';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ArtistService {
+  private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/artists`;
 
-  constructor(private http: HttpClient) {}
-
-  // Obtener todos los artistas
   getArtists(): Observable<Artist[]> {
-    return this.http.get<Artist[]>(`${this.apiUrl}`);
+    return this.http.get<Artist[]>(this.apiUrl);
   }
 
-  // Obtener un artista por ID
   getArtistById(id: number): Observable<Artist> {
     return this.http.get<Artist>(`${this.apiUrl}/${id}`);
   }
 
-  // Obtener canciones de un artista
   getSongsByArtist(id: number): Observable<Song[]> {
     return this.http.get<Song[]>(`${this.apiUrl}/${id}/songs`);
   }
 
-  // Buscar artistas por nombre
+  private getFullSongPath(path: string): string {
+    if (!path) return '';
+    if (path.startsWith('http')) return path;
+    return `${environment.apiUrl}/${path.replace(/^\//, '')}`;
+  }
+
   searchArtistsByName(name: string): Observable<Artist[]> {
     return this.http.get<Artist[]>(`${this.apiUrl}/search/${name}`);
   }

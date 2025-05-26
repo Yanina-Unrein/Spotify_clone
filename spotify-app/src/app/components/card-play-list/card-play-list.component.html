@@ -3,7 +3,7 @@
   [ngClass]="{'has-image': hasImage}"
   [style.background-color]="playlist.color">
   <div class="playlist-card-button-play">
-    <app-card-playlist-button [music]="playlist"></app-card-playlist-button>
+    <app-card-playlist-button  [songs]="validSongs()" [playlistId]="'playlist-' + playlist.id"></app-card-playlist-button>
   </div>
   <a
     [routerLink]="['/playlist', playlist.id]"
@@ -12,15 +12,15 @@
   >
     <picture class="playlist-image-container" *ngIf="hasImage">
       <img
-        [src]="cover"
-        [alt]="'Portada de ' + title"
+        [src]="cover()"
+        [alt]="'Portada de ' + title()"
         class="playlist-image"
       />
     </picture>
 
     <div class="playlist-content">
-      <h4 class="playlist-title">{{ title }}</h4>
-      <span class="playlist-artists">{{ artistsString }}</span>
+      <h4 class="playlist-title">{{ title() }}</h4>
+      <span class="playlist-artists">{{ artistsString() }}</span>
     </div>
   </a>
 </article>

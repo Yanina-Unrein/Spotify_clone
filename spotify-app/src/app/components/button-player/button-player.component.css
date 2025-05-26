@@ -3,6 +3,7 @@
     justify-content: center;
     gap: 1rem;
     align-items: center;
+    width: 100%;
 }
 
 .player-reproductor-button-prev,
@@ -22,4 +23,37 @@ button {
   
   button:hover {
     transform: scale(1); /* Efecto de hover */
+  }
+
+  .player-progress-bar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  input[type="range"] {
+    width: 350px;
+    height: 8px;
+    background: #ccc;
+    border-radius: 5px;
+    -webkit-appearance: none;
+  }
+  
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 16px;
+    width: 16px;
+    background: #1db954;
+    border-radius: 50%;
+  }
+  
+  input[type="range"]:focus {
+    outline: none;
+  }
+  
+  span {
+    font-size: 0.9rem;
+    color: #b3b3b3;
+    margin-left: 10px;
   }

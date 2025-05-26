@@ -1,11 +1,11 @@
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
 import { AsideLibraryItemComponent } from "../aside-library-item/aside-library-item.component";
 import { CardAsideComponent } from '../card-aside/card-aside.component';
 import { BtnAddComponent } from "../btn-add/btn-add.component";
 import { PlaylistService } from '@/app/services/playlist/playlist.service';
 import { AuthService } from '@/app/services/auth/auth.service';
-import { CreatePlaylistDTO, Playlist } from '@/app/models/PlaylistModel';
+import { Playlist } from '@/app/models/PlaylistModel';
 
 @Component({
   selector: 'app-aside-menu',
@@ -14,48 +14,29 @@ import { CreatePlaylistDTO, Playlist } from '@/app/models/PlaylistModel';
   templateUrl: './aside-menu.component.html',
   styleUrl: './aside-menu.component.css'
 })
-export class AsideMenuComponent implements OnInit {
-  playlists: Playlist[] = [];
+export class AsideMenuComponent {
+  private playlistService = inject(PlaylistService);
+  private authService = inject(AuthService);
 
-  constructor(
-    private playlistService: PlaylistService,
-    private authService: AuthService
-  ) {}
+  // Usamos signal para las playlists
+  playlists = signal<Playlist[]>([]);
 
-  ngOnInit(): void {
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser) {
-      this.loadUserPlaylists(currentUser.id);
-    }
+  constructor() {
+    this.loadPlaylists();
   }
 
-  loadUserPlaylists(userId: number) {
+  // Método para cargar playlists
+  loadPlaylists() {
+    const userId = this.authService.currentUser()?.id;
+    if (!userId) return;
+
     this.playlistService.getPlaylistsByUser(userId).subscribe({
       next: (playlists) => {
-        this.playlists = playlists;
+        this.playlists.set(playlists);
       },
       error: (error) => {
-        console.error('Error al cargar las playlists:', error);
+        console.error('Error al cargar playlists:', error);
       }
     });
-  }
-
-  createPlaylist() {
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser) {
-      const newPlaylist: CreatePlaylistDTO = {
-        userId: currentUser.id,
-        title: 'Nueva Playlist'
-      };
-
-      this.playlistService.createPlaylist(newPlaylist).subscribe({
-        next: (playlist) => {
-          this.playlists = [...this.playlists, playlist];
-        },
-        error: (error) => {
-          console.error('Error al crear playlist:', error);
-        }
-      });
-    }
   }
 }

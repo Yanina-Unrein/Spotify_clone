@@ -15,15 +15,15 @@
             <input type="search" placeholder="¿Qué quieres reproducir?" #searchInput (input)="onSearch(searchInput.value)">
         </div>
     </div>
-    <div class="user-container">
+     <div class="user-container">
         <!-- Mostrar estos botones solo si NO hay usuario logueado -->
-        <ng-container *ngIf="!currentUser">
+        <ng-container *ngIf="!currentUser()">
             <a class="sing-up-link" [routerLink]="['/registrarse']">Registrarse</a>
             <a class="log-in-link" [routerLink]="['/login']">Iniciar sesión</a>
         </ng-container>
 
         <!-- Mostrar el botón de usuario si hay alguien logueado -->
-        <div *ngIf="currentUser" class="user-menu-container">
+        <div *ngIf="currentUser()" class="user-menu-container">
             <button class="user-button" (click)="toggleUserMenu()">
                 {{ getUserInitial() }}
             </button>
@@ -31,15 +31,10 @@
             <!-- Menú desplegable -->
             <div class="user-menu" *ngIf="showUserMenu">
                 <div class="user-info">
-                    <span class="user-name">{{ currentUser.first_name }} {{ currentUser.last_name }}</span>
-                    <span class="user-email">{{ currentUser.email }}</span>
+                    <span class="user-name">{{ currentUser()?.first_name }} {{ currentUser()?.last_name }}</span>
+                    <span class="user-email">{{ currentUser()?.email }}</span>
                 </div>
-                <div class="menu-items">
-                    <a [routerLink]="['/perfil']" (click)="showUserMenu = false">Perfil</a>
-                    <a [routerLink]="['/favoritos']" (click)="showUserMenu = false">Favoritos</a>
-                    <a [routerLink]="['/playlists']" (click)="showUserMenu = false">Playlists</a>
-                    <button class="logout-button" (click)="logout()">Cerrar sesión</button>
-                </div>
+                <!-- ... resto del menú ... -->
             </div>
         </div>
     </div>

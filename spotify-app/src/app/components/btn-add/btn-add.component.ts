@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, inject, Output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalPlaylistComponent } from '../modalPlaylistAdd/modal-playlist/modal-playlist.component';
 import { PlaylistService } from '@/app/services/playlist/playlist.service';
@@ -12,41 +12,35 @@ import { AuthService } from '@/app/services/auth/auth.service';
   styleUrl: './btn-add.component.css'
 })
 export class BtnAddComponent {
-  @Output() createPlaylist = new EventEmitter<void>();
-  showModal: boolean = false;
+  private playlistService = inject(PlaylistService);
+  private authService = inject(AuthService);
 
-  constructor(
-    private playlistService: PlaylistService,
-    private authService: AuthService
-  ) {}
+  showModal = signal(false);
+  currentUser = this.authService.currentUser;
 
   onSavePlaylist(name: string) {
-    const currentUser = this.authService.getCurrentUser();
-    
-    if (!currentUser) {
-      console.error('No hay usuario logueado');
-      return;
-    }
+    const user = this.currentUser();
+    if (!user) return;
 
     const data = {
-      userId: currentUser.id, // Cambiado de user_id a userId
+      userId: user.id,
       title: name.trim()
     };
-    
+
     if (!data.title) return;
 
-    console.log('Datos a enviar:', data);
-
     this.playlistService.createPlaylist(data).subscribe({
-      next: (playlist) => {
-        console.log('Playlist creada:', playlist);
-        this.showModal = false;
-        this.createPlaylist.emit();
+      next: (newPlaylist) => {
+        console.log('Playlist creada:', newPlaylist);
+        this.showModal.set(false);
+        // No necesitamos emitir evento, el servicio ya notifica
+        alert('Playlist creada con éxito!');
       },
       error: (error) => {
         console.error('Error al crear playlist:', error);
-        console.log('Error details:', error.error);
+        alert('Error al crear la playlist: ' + error.message);
       }
     });
   }
 }
+

@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, computed, EventEmitter, Input, Output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CardPlaylistButtonComponent } from "../card-playlist-button/card-playlist-button.component";
-import { Playlist } from '@/app/models/PlaylistModel';
 import { CommonModule } from '@angular/common';
+import { Playlist } from '@/app/models/PlaylistModel';
 
 @Component({
   selector: 'app-card-play-list',
@@ -12,43 +12,67 @@ import { CommonModule } from '@angular/common';
   styleUrl: './card-play-list.component.css'
 })
 export class CardPlayListComponent {
-  @Input() playlist!: Playlist;
+   // Signal con valor inicial
+  private _playlist = signal<Playlist>(this.createEmptyPlaylist());
+
+  // Input no nullable con valor requerido
+  @Input({ required: true }) 
+  set playlist(value: Playlist) {
+    this._playlist.set(value);
+  }
+  get playlist(): Playlist {
+    return this._playlist();
+  }
+
+  // Computed properties
+  title = computed(() => this.playlist.title);
+  color = computed(() => this.playlist.color); 
+  
+  hasImage = computed(() => {
+    const firstSong = this.playlist.songs?.[0];
+    return !!firstSong?.image_path;
+  });
+
+  cover = computed(() => {
+    return this.playlist.songs?.[0]?.image_path || null;
+  });
+
+  artistsString = computed(() => {
+    const songs = this.playlist.songs;
+    if (!songs || songs.length === 0) return 'Playlist vacía';
+
+    const artists = new Set<string>();
+    songs.forEach(song => {
+      song.artists?.forEach(artist => artists.add(artist.name));
+    });
+    
+    return artists.size > 0 ? 
+           Array.from(artists).join(', ') : 
+           'Varios artistas';
+  });
+
+  validSongs = computed(() => {
+    return this.playlist.songs?.filter(song => 
+      song?.id && song?.path_song
+    ) || [];
+  });
+
   @Output() cardClick = new EventEmitter<Playlist>();
 
-  get id(): number {
-    return this.playlist.id;
-  }
-
-  get title(): string {
-    return this.playlist.title;
-  }
-
-  get hasImage(): boolean {
-    return !!(this.playlist.songs && this.playlist.songs.length > 0 && this.playlist.songs[0].image_path);
-  }
-
-  get cover(): string | null {
-    return this.hasImage ? (this.playlist.songs?.[0]?.image_path || null) : null;
-  }
-
-  get artistsString(): string {
-    if (!this.playlist.songs || this.playlist.songs.length === 0) {
-      return 'Playlist vacía';
-    }
-
-    const uniqueArtists = new Set<string>();
-    this.playlist.songs.forEach(song => {
-      song.artists?.forEach(artist => {
-        uniqueArtists.add(artist.name);
-      });
-    });
-
-    const artistsArray = Array.from(uniqueArtists);
-    return artistsArray.length > 0 ? artistsArray.join(', ') : 'Sin artistas';
+  // Crea una playlist vacía para inicialización
+  private createEmptyPlaylist(): Playlist {
+    return {
+      id: 0,
+      user_id: 0,
+      title: '',
+      color: '#333333',
+      songs: []
+    };
   }
 
   onCardClick() {
-    console.log('Playlist ID:', this.playlist.id); // Debug
-    this.cardClick.emit(this.playlist);
+    if (this.playlist.id) {
+      this.cardClick.emit(this.playlist);
+    }
   }
 }

@@ -1,12 +1,16 @@
-<article class="playlist-card">
-  <div class="play-card-button">
-    <app-button-play-small [music]="playablePlaylist"></app-button-play-small>
-  </div>
-  <a [routerLink]="['/playlist', playlist.id]" class="playlist-item">
-    <picture [style.--background-image]="background"></picture>
-    <div class="flex-auto">
-      <h4>{{ playlistTitle }}</h4>
-      <span>{{ playlist.songs?.length || 0 }} canciones</span>
-    </div>
-  </a>
+ <article class="playlist-card">
+      <div class="play-card-button">
+        <app-button-play-small 
+          [song]="firstSong()" 
+          [playlistId]="'playlist-' + playlist.id"
+          [playlistSongs]="playlist.songs || []">
+        </app-button-play-small>
+      </div>
+      <a [routerLink]="['/playlist', playlist.id]" class="playlist-item">
+        <picture [style.--background-image]="background()"></picture>
+        <div class="flex-auto">
+          <h4>{{ playlistTitle() }}</h4>
+          <span>{{ songCount() }} canciones</span>
+        </div>
+      </a>
 </article>

@@ -1,17 +1,23 @@
 <article class="artist-card">
-  <!-- Botón de reproducción -->
   <div class="artist-card-button-play">
-    <app-card-playlist-button  [music]="artistSongs"></app-card-playlist-button>
+    <app-card-playlist-button 
+      [songs]="artistSongs()" 
+      [playlistId]="'artist-' + artist().id">
+    </app-card-playlist-button>
   </div>
 
-  <!-- Enlace para navegar al detalle del artista -->
-  <a [routerLink]="['/artist', artist.id]" class="artist-item" (click)="onCardClick()">
+  <a [routerLink]="['/artist', artist().id]" class="artist-item" (click)="onCardClick()">
     <picture class="artist-image-container">
-      <img [src]="photo" [alt]="'Photo of ' + name" class="artist-image" />
+      <img 
+        [src]="photo()" 
+        [alt]="'Photo of ' + name()" 
+        class="artist-image"
+        onerror="this.style.display='none'"
+      />
     </picture>
 
     <div class="artist-content">
-      <h4 class="artist-name">{{ name }}</h4>
+      <h4 class="artist-name">{{ name() }}</h4>
     </div>
   </a>
 </article>

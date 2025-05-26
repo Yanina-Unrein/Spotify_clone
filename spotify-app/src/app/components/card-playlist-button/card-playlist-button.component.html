@@ -1,9 +1,12 @@
-<button (click)="handleClick()" class="card-play-button">
-  <ng-container *ngIf="isPlaying; else playIcon">
+<button 
+(click)="handleClick()" 
+class="card-play-button"
+ [disabled]="!songs || songs.length === 0"
+  [class.playing]="isPlaying()"
+  >
+  @if (isPlaying()) {
     <img src="/icons/Pause_Greem_Hover.svg" class="icon" alt="Pause" />
-  </ng-container>
-  <ng-template #playIcon>
+  } @else {
     <img src="/icons/Play_Greem_Hover.svg" class="icon" alt="Play" />
-  </ng-template>
+  }
 </button>
-

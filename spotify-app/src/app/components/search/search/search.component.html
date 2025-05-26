@@ -1,31 +1,45 @@
+<!-- search.component.html -->
 <div class="search-results">
-    <div  class="container-search">
-        <h2>Canciones</h2>
-        <div *ngIf="songs.length; else noSongs" class="song-card-container">
-          <app-song-view *ngFor="let song of songs" [song]="song"></app-song-view>
+    @if (isLoading()) {
+        <div class="loading-indicator">Buscando...</div>
+    }
+    @else if (hasResults()) {
+        <div class="container-search">
+            <h2>Canciones</h2>
+            @if (songs().length) {
+                <div class="song-card-container">
+                    <app-song-view *ngFor="let song of songs()" [song]="song"></app-song-view>
+                </div>
+            } @else {
+                <p>No se encontraron canciones.</p>
+            }
         </div>
-        <ng-template #noSongs>
-            <p>No se encontraron canciones.</p>
-        </ng-template>
-    </div>
 
-   <div class="container-search">
-        <h2>Artistas</h2>
-        <div *ngIf="artists.length; else noArtists" class="card-container">
-            <app-card-artist *ngFor="let artist of artists" [artist]="artist"></app-card-artist>
+        <div class="container-search">
+            <h2>Artistas</h2>
+            @if (artists().length) {
+                <div class="card-container">
+                    <app-card-artist *ngFor="let artist of artists()" [artist]="artist"></app-card-artist>
+                </div>
+            } @else {
+                <p>No se encontraron artistas.</p>
+            }
         </div>
-        <ng-template #noArtists>
-            <p>No se encontraron artistas.</p>
-        </ng-template>
-    </div>
 
-    <div class="container-search">
-        <h2>Playlists</h2>
-        <div *ngIf="playlists.length; else noPlaylists" class="card-container">
-            <app-card-play-list *ngFor="let playlist of playlists" [playlist]="playlist"></app-card-play-list>
+        <div class="container-search">
+            <h2>Playlists</h2>
+            @if (playlists().length) {
+                <div class="card-container">
+                    <app-card-play-list *ngFor="let playlist of playlists()" [playlist]="playlist"></app-card-play-list>
+                </div>
+            } @else {
+                <p>No se encontraron playlists.</p>
+            }
         </div>
-        <ng-template #noPlaylists>
-            <p>No se encontraron playlists.</p>
-        </ng-template>
-    </div>
+    }
+    @else if (searchQuery()) {
+        <div class="no-results">
+            No se encontraron resultados para "{{ searchQuery() }}"
+        </div>
+    }
 </div>

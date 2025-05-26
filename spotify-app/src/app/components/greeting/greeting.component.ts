@@ -13,9 +13,9 @@ export class GreetingComponent implements OnInit {
     const currentTime = new Date();
     const currentHour = currentTime.getHours();
 
-    if (currentHour < 12) {
+    if (currentHour < 13) {
       this.greeting = 'Buenos días';
-    } else if (currentHour < 18) {
+    } else if (currentHour < 19) {
       this.greeting = 'Buenas tardes';
     } else {
       this.greeting = 'Buenas noches';

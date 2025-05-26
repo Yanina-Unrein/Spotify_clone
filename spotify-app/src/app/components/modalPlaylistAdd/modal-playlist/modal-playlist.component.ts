@@ -10,15 +10,24 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './modal-playlist.component.css'
 })
 export class ModalPlaylistComponent {
-  @Output() save = new EventEmitter<string>();
+ @Output() save = new EventEmitter<string>();
   @Output() cancel = new EventEmitter<void>();
   
   playlistName: string = '';
+  isLoading = false; 
 
   onSave() {
-    if (this.playlistName.trim()) {
-      this.save.emit(this.playlistName);
+    if (!this.playlistName.trim()) return;
+    
+    this.isLoading = true; 
+    
+    try {
+      this.save.emit(this.playlistName.trim());
       this.playlistName = '';
+    } catch (error) {
+      console.error('Error en modal:', error);
+    } finally {
+      this.isLoading = false;
     }
   }
 

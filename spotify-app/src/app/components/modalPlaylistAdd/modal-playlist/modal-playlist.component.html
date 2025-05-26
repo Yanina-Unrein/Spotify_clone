@@ -3,20 +3,17 @@
       <button class="close-button" (click)="onCancel()">
         <img src="/icons/Close.svg" alt="Cerrar">
       </button>
-      
       <h2>Coloca el nombre de tu playlist</h2>
-      
       <input 
         type="text" 
         [(ngModel)]="playlistName" 
         placeholder="Mi playlist"
         class="playlist-input">
-      
       <button 
         class="save-button" 
         (click)="onSave()" 
-        [disabled]="!playlistName.trim()">
-        Guardar
+        [disabled]="!playlistName.trim() || isLoading">
+        {{ isLoading ? 'Guardando...' : 'Guardar' }}
       </button>
     </div>
-  </div>
+</div>

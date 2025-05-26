@@ -1,8 +1,7 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, computed, inject, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription, combineLatest } from 'rxjs';
-import { PlayableItem } from '@/app/models/SongModel';
 import { PlayerService } from '@/app/services/player/player.service';
+import { Song } from '@/app/models/SongModel';
 
 @Component({
   selector: 'app-button-play-small',
@@ -11,33 +10,58 @@ import { PlayerService } from '@/app/services/player/player.service';
   templateUrl: './button-play-small.component.html',
   styleUrl: './button-play-small.component.css'
 })
-export class ButtonPlaySmallComponent implements OnInit, OnDestroy {
-  @Input() music!: PlayableItem;
-  isPlaying: boolean = false;
-  private subscription = new Subscription();
+export class ButtonPlaySmallComponent  {
+  private playerService = inject(PlayerService);
+  
+  @Input({ required: true }) song!: Song;
+  @Input() playlistId?: string;
+  @Input() playlistSongs: Song[] = [];
 
-  constructor(private playerService: PlayerService) {}
-
-  ngOnInit(): void {
-    this.subscription.add(
-      combineLatest([
-        this.playerService.currentMusic$,
-        this.playerService.isPlaying$
-      ]).subscribe(([currentMusic, isPlaying]) => {
-        this.isPlaying = currentMusic?.id === this.music?.id && isPlaying;
-      })
-    );
+  isPlaying = computed(() => {
+  const currentSong = this.playerService.currentSong();
+  const currentPlaylistId = this.playerService.currentPlaylistId();
+  
+  // Caso 1: Reproduciendo una canción individual
+  if (!currentPlaylistId && currentSong?.id === this.song.id) {
+    return this.playerService.isPlaying();
   }
-
-  ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }
+  
+  // Caso 2: Reproduciendo una playlist/artista
+  return this.playerService.isPlaying() && 
+         currentSong?.id === this.song.id &&
+         currentPlaylistId === this.playlistId;
+});
 
   handleClick() {
-    if (this.music?.id !== this.playerService.currentMusic?.id) {
-      this.playerService.play(this.music);
+    if (this.isPlaying()) {
+      this.playerService.pause();
     } else {
-      this.playerService.togglePlay();
+      this.playSong();
+    }
+  }
+
+  private playSong() {
+    if (!this.song?.path_song) {
+      console.error('La canción no tiene ruta válida');
+      return;
+    }
+
+    // Determinar las canciones a reproducir
+    const songsToPlay = this.playlistSongs.length > 0 ? 
+      this.playlistSongs : 
+      [this.song];
+
+    // Determinar el índice de la canción actual
+    const songIndex = this.playlistSongs.findIndex(s => s.id === this.song.id);
+
+    if (this.playlistId) {
+      this.playerService.playPlaylist(
+        songsToPlay, 
+        this.playlistId, 
+        songIndex >= 0 ? songIndex : 0
+      );
+    } else {
+      this.playerService.playSong(this.song);
     }
   }
 }

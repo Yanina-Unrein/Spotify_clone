@@ -1,37 +1,67 @@
-<div class="player-reproductor-button-bar">
-  <!-- Botón "Prev" -->
-  <div class="player-reproductor-button-prev">
-    <button 
-      (click)="onPrevSong()" 
-      (mouseover)="isHoveredPrev = true" 
-      (mouseleave)="isHoveredPrev = false">
-      <img *ngIf="!isHoveredPrev" [src]="'/icons/Prev.svg'" alt="Prev" />
-      <img *ngIf="isHoveredPrev" [src]="'/icons/Prev_Hover.svg'" alt="Prev Hover" />
-    </button>
-  </div>
+ <div class="player-reproductor-button-bar">
+      <!-- Botón "Prev" -->
+      <div class="player-reproductor-button-prev">
+        <button 
+          (click)="prevSong()" 
+          [disabled]="!hasPrevious()"
+          (mouseover)="isHoveredPrev = true" 
+          (mouseleave)="isHoveredPrev = false">
+          @if (!isHoveredPrev) {
+            <img src="/icons/Prev.svg" alt="Prev" />
+          } @else {
+            <img src="/icons/Prev_Hover.svg" alt="Prev Hover" />
+          }
+        </button>
+      </div>
 
-  <!-- Botón Play/Pause -->
-  <div class="player-reproductor-button-play">
-    <button 
-      (click)="onClick()" 
-      (mouseover)="isHoveredPlay = true" 
-      (mouseleave)="isHoveredPlay = false">
-      <img *ngIf="!isPlaying && !isHoveredPlay" [src]="'/icons/Play.svg'" alt="Play" />
-      <img *ngIf="!isPlaying && isHoveredPlay" [src]="'/icons/Play_Hover.svg'" alt="Play Hover" />
-      
-      <img *ngIf="isPlaying && !isHoveredPlay" [src]="'/icons/Pause.svg'" alt="Pause" />
-      <img *ngIf="isPlaying && isHoveredPlay" [src]="'/icons/Pause_Hover.svg'" alt="Pause Hover" />
-    </button>
-  </div>
+      <!-- Botón Play/Pause -->
+      <div class="player-reproductor-button-play">
+        <button 
+          (click)="togglePlay()" 
+          [disabled]="!currentSong()"
+          (mouseover)="isHoveredPlay = true" 
+          (mouseleave)="isHoveredPlay = false">
+          @if (!isPlaying() && !isHoveredPlay) {
+            <img src="/icons/Play.svg" alt="Play" />
+          }
+          @if (!isPlaying() && isHoveredPlay) {
+            <img src="/icons/Play_Hover.svg" alt="Play Hover" />
+          }
+          @if (isPlaying() && !isHoveredPlay) {
+            <img src="/icons/Pause.svg" alt="Pause" />
+          }
+          @if (isPlaying() && isHoveredPlay) {
+            <img src="/icons/Pause_Hover.svg" alt="Pause Hover" />
+          }
+        </button>
+      </div>
 
-  <!-- Botón "Next" -->
-  <div class="player-reproductor-button-next">
-    <button 
-      (click)="onNextSong()" 
-      (mouseover)="isHoveredNext = true" 
-      (mouseleave)="isHoveredNext = false">
-      <img *ngIf="!isHoveredNext" [src]="'/icons/Next.svg'" alt="Next" />
-      <img *ngIf="isHoveredNext" [src]="'/icons/Next_Hover.svg'" alt="Next Hover" />
-    </button>
-  </div>
-</div>
+      <!-- Botón "Next" -->
+      <div class="player-reproductor-button-next">
+        <button 
+          (click)="nextSong()" 
+          [disabled]="!hasNext()"
+          (mouseover)="isHoveredNext = true" 
+          (mouseleave)="isHoveredNext = false">
+          @if (!isHoveredNext) {
+            <img src="/icons/Next.svg" alt="Next" />
+          } @else {
+            <img src="/icons/Next_Hover.svg" alt="Next Hover" />
+          }
+        </button>
+      </div>
+    </div>
+
+    <!-- Barra de progreso -->
+    @if (currentSong()) {
+      <div class="player-progress-bar">
+        <span>{{ formatTime(currentTime()) }}</span>
+        <input 
+          type="range" 
+          min="0" 
+          [max]="duration()" 
+          [value]="currentTime()" 
+          (input)="seekTo($event)" />
+        <span>{{ formatTime(duration()) }}</span>
+      </div>
+    }

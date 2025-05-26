@@ -1,131 +1,371 @@
-import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { Song } from '@/app/models/SongModel';
+import { environment } from '@/environments/environment';
+import { computed, effect, Injectable, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { PlayableItem } from '@/app/models/SongModel';
+import { PLATFORM_ID } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlayerService {
-  private audio: HTMLAudioElement;
-  private currentMusicSubject = new BehaviorSubject<PlayableItem | null>(null);
-  private isPlayingSubject = new BehaviorSubject<boolean>(false);
-  private volumeSubject = new BehaviorSubject<number>(1);
-  private isMutedSubject = new BehaviorSubject<boolean>(false);
-  private lastVolume: number = 1;
-  private playlist: PlayableItem[] = [];
-  private currentIndex: number = -1;
-  private currentPlayingIdSubject = new BehaviorSubject<number | null>(null);
+  private audio: HTMLAudioElement | null = null;
+  private platformId = inject(PLATFORM_ID);
+  
+  // Signals para el estado
+  private _currentSong = signal<Song | null>(null);
+  private _currentPlaylist = signal<Song[]>([]);
+  private _currentPlaylistId = signal<string | null>(null);
+  private _currentIndex = signal<number>(0);
+  private _isPlaying = signal(false);
+  private _currentTime = signal(0);
+  private _duration = signal(0);
+  private _volume = signal<number>(0.7);
+  private _isMuted = signal<boolean>(false);
+  private _error = signal<string | null>(null);
+  private _isShuffled = signal(false);
+  private _originalPlaylistOrder = signal<Song[]>([]);
 
-  currentMusic$ = this.currentMusicSubject.asObservable();
-  isPlaying$ = this.isPlayingSubject.asObservable();
-  volume$ = this.volumeSubject.asObservable();
-  isMuted$ = this.isMutedSubject.asObservable();
+  // Exponer señales como de solo lectura
+  currentSong = this._currentSong.asReadonly();
+  currentPlaylist = this._currentPlaylist.asReadonly();
+  currentPlaylistId = this._currentPlaylistId.asReadonly();
+  currentIndex = this._currentIndex.asReadonly();
+  isPlaying = this._isPlaying.asReadonly();
+  currentTime = this._currentTime.asReadonly();
+  duration = this._duration.asReadonly();
+  volume = this._volume.asReadonly();
+  isMuted = this._isMuted.asReadonly();
+  error = this._error.asReadonly();
+  isShuffled = this._isShuffled.asReadonly();
 
-  get currentMusic(): PlayableItem | null {
-    return this.currentMusicSubject.value;
-  }
-
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    this.audio = isPlatformBrowser(this.platformId) ? new Audio() : {} as HTMLAudioElement;
-    
+  constructor(private http: HttpClient) {
     if (isPlatformBrowser(this.platformId)) {
-      this.audio.addEventListener('ended', () => {
-        this.nextTrack();
+      this.initializeAudio();
+    }
+    
+    effect(() => {
+      const song = this._currentSong();
+      const isPlaying = this._isPlaying();
+      
+      if (song && isPlaying && isPlatformBrowser(this.platformId)) {
+        this.loadAndPlay(song).catch(error => {
+          console.error('Error en effect:', error);
+          this._isPlaying.set(false);
+        });
+       }
+    });
+  }
+
+  private initializeAudio() {
+    try {
+      this.audio = new Audio();
+      this.setupAudioListeners();
+      this.audio.volume = this._volume();
+      this.audio.preload = 'metadata';
+    } catch (error) {
+      console.error('Error al inicializar el reproductor:', error);
+      this._error.set('Error al inicializar el reproductor');
+    }
+  }
+
+  private setupAudioListeners() {
+    if (!this.audio) return;
+
+    this.audio.addEventListener('error', (e) => {
+      console.error('Error de audio:', e);
+      this._error.set(this.getAudioErrorMessage(this.audio?.error || null));
+      this._isPlaying.set(false);
+    });
+
+    this.audio.addEventListener('timeupdate', () => {
+      this._currentTime.set(this.audio?.currentTime || 0);
+    });
+
+    this.audio.addEventListener('loadedmetadata', () => {
+      this._duration.set(this.audio?.duration || 0);
+    });
+
+    this.audio.addEventListener('ended', () => {
+      this.handleSongEnded();
+    });
+
+    this.audio.addEventListener('canplay', () => {
+      console.log('Audio listo para reproducir');
+    });
+
+    this.audio.addEventListener('waiting', () => {
+      console.log('Audio cargando...');
+    });
+  }
+
+  private async loadAndPlay(song: Song): Promise<void> {
+  if (!this.audio) {
+    console.error('Audio element no inicializado');
+    return;
+  }
+
+  if (!song?.path_song) {
+    console.error('Canción no tiene path_song válido', song);
+    this._error.set('Canción no válida');
+    return;
+  }
+
+  try {
+    const audioUrl = this.getValidAudioUrl(song.path_song);
+    console.log('Reproduciendo:', song.title, 'URL:', audioUrl);
+
+    if (this.audio.src !== audioUrl) {
+      this.audio.src = audioUrl;
+      await new Promise((resolve, reject) => {
+        this.audio!.oncanplaythrough = () => resolve(true);
+        this.audio!.onerror = reject;
+        this.audio!.load();
       });
     }
+    
+    await this.audio.play();
+    this._isPlaying.set(true);
+    this._error.set(null);
+    
+  } catch (err) {
+    console.error('Error al reproducir:', err);
+    this._error.set(this.getPlayErrorMessage(err));
+    this._isPlaying.set(false);
+    
+    // Depuración adicional
+    console.log('Datos de la canción:', {
+      title: song.title,
+      originalPath: song.path_song,
+      constructedUrl: this.getValidAudioUrl(song.path_song)
+    });
+  }
+}
+
+  private getValidAudioUrl(path: string): string {
+    // Si ya es una URL completa (http/https), usarla directamente
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+
+    // Limpiar la ruta de prefijos no deseados
+    const cleanPath = path
+      .replace(/^\/?(api\/|public\/|songs\/)/, '') // Eliminar prefijos comunes
+      .replace(/^\//, ''); // Eliminar slash inicial
+
+    // Construir URL base sin /api
+    const baseUrl = environment.apiUrl.replace('/api', '');
+
+    // Si no tiene extensión, asumir .mp3
+    const finalPath = /\.\w+$/.test(cleanPath) ? cleanPath : `${cleanPath}.mp3`;
+
+    return `${baseUrl}/public/songs/${finalPath}`;
   }
 
-  play(music: PlayableItem, playlist?: PlayableItem[]): void {
-    if (!music || (this.currentMusic && this.currentMusic.id === music.id)) {
-      this.togglePlay();
+
+  private handleSongEnded() {
+    if (this.hasNext()) {
+      this.next();
+    } else {
+      this._isPlaying.set(false);
+      this._currentTime.set(0);
+      // Opcional: Repetir playlist al finalizar
+      // this._currentIndex.set(0);
+      // this._currentSong.set(this.currentPlaylist()[0]);
+    }
+  }
+
+  private getAudioErrorMessage(error: MediaError | null): string {
+    if (!error) return 'Error desconocido al reproducir audio';
+    
+    switch(error.code) {
+      case MediaError.MEDIA_ERR_ABORTED: return 'Reproducción cancelada';
+      case MediaError.MEDIA_ERR_NETWORK: return 'Error de red al cargar el audio';
+      case MediaError.MEDIA_ERR_DECODE: return 'Error al decodificar el audio';
+      case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: 
+        return 'Formato no soportado o archivo no encontrado';
+      default: return 'Error al reproducir el audio';
+    }
+  }
+
+  private getPlayErrorMessage(error: any): string {
+    // Manejar eventos de error de audio
+    if (error instanceof ErrorEvent || error?.type === 'error') {
+      return this.getAudioErrorMessage(this.audio?.error || null);
+    }
+
+    // Manejar errores de reproducción
+    if (error?.name) {
+      switch(error.name) {
+        case 'NotSupportedError': return 'Formato de audio no soportado';
+        case 'NotAllowedError': return 'Reproducción bloqueada por política del navegador';
+        case 'AbortError': return 'Reproducción abortada';
+      }
+    }
+
+    // Manejar mensajes de error estándar
+    if (error?.message) {
+      if (typeof error.message === 'string' && error.message.includes('404')) {
+        return 'Archivo de audio no encontrado';
+      }
+      return error.message;
+    }
+
+    return 'Error al reproducir la canción';
+  }
+
+  // Métodos públicos
+  playPlaylist(playlist: Song[], playlistId: string, startIndex: number = 0) {
+    if (!playlist?.length) {
+      console.error('Playlist vacía');
+      this._error.set('Playlist vacía');
       return;
     }
-  
-    if (playlist) {
-      this.playlist = playlist;
-      this.currentIndex = this.playlist.findIndex(item => item.id === music.id);
-    } else {
-      this.playlist = [music];
-      this.currentIndex = 0;
-    }
-  
-    this.currentMusicSubject.next(music);
-    this.currentPlayingIdSubject.next(music.id);
-  
-    // Construcción de la URL del audio
-    const audioUrl = `http://localhost:3008${music.path_song}`;
-    console.log("URL del audio:", audioUrl);
-  
-    if (!this.audio.canPlayType('audio/mpeg') && !this.audio.canPlayType('audio/ogg') && !this.audio.canPlayType('audio/wav')) {
-      console.error("El navegador no soporta este formato de audio.");
+
+    const validSongs = playlist.filter(song => song?.path_song);
+    
+    if (!validSongs.length) {
+      this._error.set('No hay canciones válidas en la playlist');
       return;
     }
-  
-    this.audio.src = audioUrl;
-    this.audio.load();  
-  
-    this.audio.play()
-      .then(() => {
-        this.isPlayingSubject.next(true);  // Asegúrate de actualizar isPlayingSubject
-      })
-      .catch(error => {
-        console.error("Error al reproducir el audio:", error);
-      });
+
+    // Asegurarse que el playlistId tenga el formato correcto
+    const normalizedPlaylistId = playlistId.startsWith('playlist-') || 
+                              playlistId.startsWith('artist-') || 
+                              playlistId.startsWith('single-')
+      ? playlistId
+      : `playlist-${playlistId}`;
+
+    this._originalPlaylistOrder.set([...validSongs]);
+    this._currentPlaylist.set([...validSongs]);
+    this._currentPlaylistId.set(normalizedPlaylistId);
+    this._currentIndex.set(Math.min(startIndex, validSongs.length - 1));
+    this._currentSong.set(validSongs[Math.min(startIndex, validSongs.length - 1)]);
+    this._isShuffled.set(false);
+    this._isPlaying.set(true);
   }
 
-  previousTrack(): void {
-    if (this.playlist.length === 0 || this.currentIndex === -1) return;
+  playSong(song: Song) {
+    if (!song?.path_song) {
+      this._error.set('Canción no válida');
+      return;
+    }
     
-    if (this.audio.currentTime > 3) {
-      // Si han pasado más de 3 segundos, reinicia la canción actual
-      this.audio.currentTime = 0;
-      this.audio.play();
+    this._currentSong.set(song);
+    this._currentPlaylist.set([song]);
+    this._currentPlaylistId.set(`single-${song.id}`);
+    this._currentIndex.set(0);
+    this._isShuffled.set(false);
+    this._isPlaying.set(true);
+  }
+
+  togglePlay() {
+    if (!this.audio || !this.currentSong()) return;
+
+    if (this.isPlaying()) {
+      this.pause();
     } else {
-      // Si no, reproduce la canción anterior
-      this.currentIndex = (this.currentIndex - 1 + this.playlist.length) % this.playlist.length;
-      const previousSong = this.playlist[this.currentIndex];
-      this.play(previousSong);
+      this.audio.play()
+        .then(() => this._isPlaying.set(true))
+        .catch(error => {
+          console.error('Error al reanudar:', error);
+          this._error.set(this.getPlayErrorMessage(error));
+        });
     }
   }
 
-  nextTrack(): void {
-    if (this.playlist.length === 0 || this.currentIndex === -1) return;
+  pause() {
+    if (!this.audio) return;
+    this.audio.pause();
+    this._isPlaying.set(false);
+  }
+
+  next() {
+    if (this.hasNext()) {
+      const newIndex = this.currentIndex() + 1;
+      this._currentIndex.set(newIndex);
+      this._currentSong.set(this.currentPlaylist()[newIndex]);
+    }
+  }
+
+  previous() {
+    if (this.hasPrevious()) {
+      const newIndex = this.currentIndex() - 1;
+      this._currentIndex.set(newIndex);
+      this._currentSong.set(this.currentPlaylist()[newIndex]);
+    }
+  }
+
+  seekTo(time: number) {
+    if (!this.audio || isNaN(time)) return;
+    this.audio.currentTime = time;
+    this._currentTime.set(time);
+  }
+
+  setVolume(volume: number) {
+    const newVolume = Math.min(1, Math.max(0, volume));
+    this._volume.set(newVolume);
     
-    this.currentIndex = (this.currentIndex + 1) % this.playlist.length;
-    const nextSong = this.playlist[this.currentIndex];
-    this.play(nextSong);
-  }
-
-  togglePlay(): void {
-    if (this.audio.paused) {
-      this.audio.play();
-      this.isPlayingSubject.next(true);
-    } else {
-      this.audio.pause();
-      this.isPlayingSubject.next(false);
+    if (this.audio) {
+      this.audio.volume = newVolume;
+      this._isMuted.set(false);
+      this.audio.muted = false;
     }
   }
 
-  setVolume(volume: number): void {
-    if (volume === 0) {
-      this.isMutedSubject.next(true);
-    } else {
-      this.isMutedSubject.next(false);
-      this.lastVolume = volume;
-    }
-    this.audio.volume = volume;
-    this.volumeSubject.next(volume);
+  toggleMute() {
+    if (!this.audio) return;
+    
+    const willMute = !this.isMuted();
+    this._isMuted.set(willMute);
+    this.audio.muted = willMute;
   }
 
-  toggleMute(): void {
-    const isMuted = this.isMutedSubject.value;
-    if (isMuted) {
-      this.setVolume(this.lastVolume);
+  toggleShuffle() {
+    if (this.isShuffled()) {
+      // Restaurar orden original
+      this._currentPlaylist.set([...this._originalPlaylistOrder()]);
+      this._isShuffled.set(false);
     } else {
-      this.lastVolume = this.volumeSubject.value;
-      this.setVolume(0);
+      // Mezclar playlist
+      const shuffled = [...this.currentPlaylist()];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      this._currentPlaylist.set(shuffled);
+      this._isShuffled.set(true);
     }
-    this.isMutedSubject.next(!isMuted);
+    
+    // Ajustar el índice actual para mantener la canción que se está reproduciendo
+    const currentSongId = this.currentSong()?.id;
+    if (currentSongId) {
+      const newIndex = this.currentPlaylist().findIndex(s => s.id === currentSongId);
+      if (newIndex !== -1) {
+        this._currentIndex.set(newIndex);
+      }
+    }
   }
+
+  clearError() {
+    this._error.set(null);
+  }
+
+  // Computed properties
+  hasNext = computed(() => {
+    const playlist = this.currentPlaylist();
+    const index = this.currentIndex();
+    return playlist.length > 0 && index < playlist.length - 1;
+  });
+
+  hasPrevious = computed(() => this.currentIndex() > 0);
+
+  getProgress = computed(() => {
+    if (this.duration() <= 0) return 0;
+    return (this.currentTime() / this.duration()) * 100;
+  });
+
+  getTimeRemaining = computed(() => {
+    return this.duration() - this.currentTime();
+  });
 }

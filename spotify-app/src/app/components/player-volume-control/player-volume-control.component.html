@@ -1,13 +1,14 @@
 <div class="volume-control">
-    <app-player-volume-icon 
-        [isMuted]="isMuted" 
-        (muteToggle)="toggleMute($event)">
-    </app-player-volume-icon>
-    <input type="range" 
-           min="0" 
-           max="1" 
-           step="0.01" 
-           [(ngModel)]="volume" 
-           (input)="onVolumeChange($event)" 
-           class="volume-slider" />
+      <app-player-volume-icon 
+        [isMuted]="isMuted()" 
+        (muteToggle)="toggleMute()">
+      </app-player-volume-icon>
+      <input 
+        type="range" 
+        min="0" 
+        max="1" 
+        step="0.01" 
+        [value]="volume()" 
+        (input)="onVolumeChange($event)" 
+        class="volume-slider" />
 </div>

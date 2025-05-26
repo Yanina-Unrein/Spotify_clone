@@ -1,62 +1,50 @@
 import { AuthResponse, User } from '@/app/models/UserModel';
 import { environment } from '@/environments/environment';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
-import { BehaviorSubject, Observable, tap, catchError } from 'rxjs';
+import { Injectable, inject, signal, computed, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { catchError, tap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = `${environment.apiUrl}/auth`;
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
-  private platformId: Object;
+    private apiUrl = `${environment.apiUrl}/auth`;
+  private http = inject(HttpClient);
+  private platformId = inject(PLATFORM_ID);
 
-  constructor(
-    private http: HttpClient,
-    @Inject(PLATFORM_ID) platformId: Object
-  ) {
-    this.platformId = platformId;
+  // Signal privada para el estado del usuario
+  private _currentUser = signal<User | null>(null);
+
+  // Exponemos la Signal como readonly
+  currentUser = this._currentUser.asReadonly();
+
+  // Computed property para saber si está autenticado
+  isAuthenticated = computed(() => !!this._currentUser());
+
+  constructor() {
+    this.initializeUser();
+  }
+  private initializeUser() {
     if (isPlatformBrowser(this.platformId)) {
-      // Recuperar usuario del localStorage al iniciar
       const savedUser = localStorage.getItem('currentUser');
       if (savedUser) {
-        this.currentUserSubject.next(JSON.parse(savedUser));
+        this._currentUser.set(JSON.parse(savedUser));
       }
     }
-
-    console.log('Auth Service URL:', `${this.apiUrl}/login`); // Debug URL
   }
 
-  register(userData: { name: string; email: string; password: string }): Observable<AuthResponse> {
+  register(userData: { name: string; email: string; password: string }) {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData).pipe(
-      tap((response: AuthResponse) => this.handleAuthentication(response))
+      tap((response) => this.handleAuthentication(response))
     );
   }
 
-  login(credentials: { email: string; password: string }): Observable<AuthResponse> {
-    console.log('URL completa:', `${this.apiUrl}/login`);
-    console.log('Credenciales enviadas:', credentials);
-
+  login(credentials: { email: string; password: string }) {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
-      tap(response => {
-        console.log('Login response:', response); // Debug
-        if (isPlatformBrowser(this.platformId)) {
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('currentUser', JSON.stringify(response.user));
-          this.currentUserSubject.next(response.user);
-        }
-      }),
+      tap(response => this.handleAuthentication(response)),
       catchError((error: HttpErrorResponse) => {
-        console.error('Error detallado:', {
-          error: error,
-          status: error.status,
-          statusText: error.statusText,
-          message: error.message,
-          url: error.url
-        });
+        console.error('Login error:', error);
         throw error;
       })
     );
@@ -67,7 +55,7 @@ export class AuthService {
       localStorage.removeItem('token');
       localStorage.removeItem('currentUser');
     }
-    this.currentUserSubject.next(null);
+    this._currentUser.set(null);
   }
 
   private handleAuthentication(response: AuthResponse): void {
@@ -75,26 +63,22 @@ export class AuthService {
       localStorage.setItem('token', response.token);
       localStorage.setItem('currentUser', JSON.stringify(response.user));
     }
-    this.currentUserSubject.next(response.user);
+    this._currentUser.set(response.user);
   }
 
-  private validateToken(): void {
-    this.http.get<User>(`${this.apiUrl}/validate`).subscribe({
-      next: (user) => this.currentUserSubject.next(user),
-      error: () => {
-        if (isPlatformBrowser(this.platformId)) {
-          localStorage.removeItem('token');
-        }
-        this.currentUserSubject.next(null);
+  verifyAndLoadUser() {
+  return this.http.get<{user: User, token: string}>(`${this.apiUrl}/verify`).pipe(
+    tap(response => {
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('currentUser', JSON.stringify(response.user));
       }
-    });
-  }
-
-  isLoggedIn(): boolean {
-    return !!this.currentUserSubject.value;
-  }
-
-  getCurrentUser(): User | null {
-    return this.currentUserSubject.value;
-  }
+      this._currentUser.set(response.user);
+    }),
+    catchError(error => {
+      this.logout();
+      return throwError(() => error);
+    })
+  );
+}
 }
