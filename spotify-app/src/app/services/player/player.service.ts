@@ -113,7 +113,6 @@ export class PlayerService {
 
   try {
     const audioUrl = this.getValidAudioUrl(song.path_song);
-    console.log('Reproduciendo:', song.title, 'URL:', audioUrl);
 
     if (this.audio.src !== audioUrl) {
       this.audio.src = audioUrl;

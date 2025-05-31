@@ -1,0 +1,29 @@
+<div class="song-actions-menu">
+    <ul>
+      <li (click)="togglePlaylistOptions()"><img src="/icons/Add_icon.svg" alt="icon agregar">Añadir a lista</li>
+      <li (click)="addToFavorites()"><img src="/icons/Heart_favorite.svg" alt="icon corazon">Guardar en Canciones que te gustan</li>
+      <!-- Otras opciones del menú -->
+    </ul>
+    <div class="playlist-submenu" *ngIf="showPlaylistOptions">
+      <div class="search-container">
+        <input 
+          type="text" 
+          [(ngModel)]="searchQuery" 
+          placeholder="Buscar lista..."
+          class="search-input"
+        >
+      </div>
+      <ul>
+        <li (click)="openCreatePlaylistModal()">+ Nueva lista</li>
+        <li *ngFor="let playlist of filteredPlaylists" 
+          (click)="addToPlaylist(playlist.id)">
+          {{ playlist.title }}
+        </li>
+      </ul>
+    </div>
+     <app-modal-playlist 
+      *ngIf="showCreatePlaylistModal"
+      (save)="handlePlaylistSave($event)"
+      (cancel)="showCreatePlaylistModal = false">
+    </app-modal-playlist>
+</div>

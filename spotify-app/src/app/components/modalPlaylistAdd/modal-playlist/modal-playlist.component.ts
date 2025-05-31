@@ -10,29 +10,27 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './modal-playlist.component.css'
 })
 export class ModalPlaylistComponent {
- @Output() save = new EventEmitter<string>();
+  @Output() save = new EventEmitter<string>();
   @Output() cancel = new EventEmitter<void>();
   
   playlistName: string = '';
-  isLoading = false; 
+  isLoading = false;
+  errorMessage = '';
 
   onSave() {
-    if (!this.playlistName.trim()) return;
-    
-    this.isLoading = true; 
-    
-    try {
-      this.save.emit(this.playlistName.trim());
-      this.playlistName = '';
-    } catch (error) {
-      console.error('Error en modal:', error);
-    } finally {
-      this.isLoading = false;
+    if (!this.playlistName.trim()) {
+      this.errorMessage = 'El nombre no puede estar vacío';
+      return;
     }
+    
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.save.emit(this.playlistName.trim());
   }
 
   onCancel() {
     this.cancel.emit();
     this.playlistName = '';
+    this.errorMessage = '';
   }
 }

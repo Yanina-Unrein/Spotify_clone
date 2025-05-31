@@ -42,6 +42,9 @@
                     &#9888; La contraseña debe tener al menos 6 caracteres.
                   </div>
               </div>
+              <div class="forgot-password">
+                <a [routerLink]="['/reset-password']">¿Se te ha olvidado la contraseña?</a>
+              </div>
               <!-- Mensaje de Error General -->
               <div *ngIf="errorMessage" class="general-error">{{ errorMessage }}</div>
           
@@ -62,4 +65,4 @@
       <h2>¡Bienvenido de nuevo!</h2>
       <p>{{ validUser?.first_name }} {{ validUser?.last_name }}</p>
     </div>
-  </div>
+</div>

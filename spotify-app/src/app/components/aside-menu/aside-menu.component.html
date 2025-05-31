@@ -1,13 +1,21 @@
 <div class="spotify__home-container_side-bar">
-      <div class="btn-container">
-        <app-aside-library-item></app-aside-library-item>
-        <app-btn-add (playlistCreated)="loadPlaylists()"></app-btn-add>
-      </div>
-      <div class="spotify__side-bar__card-container">
-        @for (playlist of playlists(); track playlist.id) {
-          <app-card-aside [playlist]="playlist"></app-card-aside>
-        } @empty {
-          <p class="empty-message">No hay playlists disponibles</p>
-        }
-      </div>
+  <div class="btn-container">
+    <app-aside-library-item></app-aside-library-item>
+    @if (authService.isAuthenticated()) {
+      <app-btn-add (playlistCreated)="loadPlaylists()"></app-btn-add>
+    }
+  </div>
+  <div class="spotify__side-bar__card-container">
+    @if (authService.isAuthenticated()) {
+      @for (playlist of playlists(); track playlist.id) {
+        <app-card-aside [playlist]="playlist"></app-card-aside>
+      } @empty {
+        <p class="empty-message">No tienes playlists creadas aún</p>
+      }
+    } @else {
+      <p class="empty-message">
+        Debes iniciar sesión para crear playlists
+      </p>
+    }
+  </div>
 </div>

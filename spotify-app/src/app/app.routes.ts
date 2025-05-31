@@ -6,6 +6,7 @@ import { ArtistDetailComponenComponent } from './pages/artistlistdetail/artist-d
 import { SignUpComponent } from './pages/sign-up/sign-up.component';
 import { LogInComponent } from './pages/log-in/log-in.component';
 import { SearchComponent } from './components/search/search/search.component';
+import { ResetPasswordComponent } from './pages/resetPassword/reset-password/reset-password.component';
 
 
 
@@ -35,4 +36,8 @@ export const routes: Routes = [
         path: 'login', 
         component: LogInComponent
       },
+      {
+        path: 'reset-password', 
+        component: ResetPasswordComponent
+      }
 ];

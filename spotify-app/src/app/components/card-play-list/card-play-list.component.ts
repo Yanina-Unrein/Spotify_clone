@@ -12,10 +12,8 @@ import { Playlist } from '@/app/models/PlaylistModel';
   styleUrl: './card-play-list.component.css'
 })
 export class CardPlayListComponent {
-   // Signal con valor inicial
-  private _playlist = signal<Playlist>(this.createEmptyPlaylist());
+private _playlist = signal<Playlist>(this.createEmptyPlaylist());
 
-  // Input no nullable con valor requerido
   @Input({ required: true }) 
   set playlist(value: Playlist) {
     this._playlist.set(value);
@@ -26,7 +24,7 @@ export class CardPlayListComponent {
 
   // Computed properties
   title = computed(() => this.playlist.title);
-  color = computed(() => this.playlist.color); 
+  color = computed(() => this.playlist.color); // Usa directamente el color de la BD
   
   hasImage = computed(() => {
     const firstSong = this.playlist.songs?.[0];
@@ -59,13 +57,12 @@ export class CardPlayListComponent {
 
   @Output() cardClick = new EventEmitter<Playlist>();
 
-  // Crea una playlist vacía para inicialización
   private createEmptyPlaylist(): Playlist {
     return {
       id: 0,
       user_id: 0,
       title: '',
-      color: '#333333',
+      color: '#333333', // Color de respaldo por si acaso
       songs: []
     };
   }

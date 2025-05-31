@@ -39,9 +39,14 @@
 
   <div class="play-button">
     <app-card-playlist-button  [songs]="playListSongs()" [playlistId]="'playlist-' + (playlist()?.id || '')"></app-card-playlist-button>
-    <picture>
+    <button class="icon-button-options" (click)="openOptions()">
       <img src="/icons/Options.svg" alt="icon opciones">
-    </picture>
+    </button>
+    <div class="playlist-options-menu" *ngIf="showPlaylistOptions()">
+      <button class="delete-playlist" (click)="deletePlaylist(); $event.stopPropagation()">
+        Eliminar playlist
+      </button>
+    </div>
   </div>
 
   <section class="songs-table" *ngIf="playListSongs().length > 0">
@@ -56,6 +61,7 @@
               <img src="/icons/Clock.svg" alt="icono de reloj">
             </picture>
           </th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -86,7 +92,14 @@
             </div>
           </td> 
           <td>{{ song.album }}</td>
-          <td>{{ song.duration }}</td>
+          <td> {{ formatDuration(song.duration) }}</td>
+          <td class="actions-cell">
+            <div class="actions-container">
+              <button class="icon-button-delete" (click)="DeleteSong(song.id); $event.stopPropagation()">
+                <img src="/icons/Trash.svg" alt="Eliminar canción" class="delete-icon">
+              </button>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -100,3 +113,11 @@
     {{ error() }}
   </div>
 </div>
+
+<app-modal-message 
+  [visible]="showModal()"
+  [title]="modalTitle()"
+  [message]="modalMessage()"
+  (confirm)="onModalConfirm()"
+  (cancel)="onModalCancel()"
+></app-modal-message>

@@ -37,6 +37,7 @@
                   <img src="/icons/Clock.svg" alt="icono de reloj">
                 </picture>
               </th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -65,7 +66,22 @@
                   <h3>{{ song.title }}</h3>
                 </td> 
                 <td>{{ song.album }}</td>
-                <td>{{ song.duration }}</td>
+                <td class="duration-cell"> {{ formatDuration(song.duration) }}</td>
+                <td class="actions-cell">
+                 <button 
+                    class="options-button" 
+                    (click)="openActionsMenu(song, $event)"
+                    [class.active]="showActionsMenu && selectedSong?.id === song.id">
+                    <img src="/icons/Options.svg" alt="Opciones">
+                  </button>
+                  <app-song-actions-menu 
+                    *ngIf="showActionsMenu && selectedSong?.id === song.id"
+                    [song]="song"
+                    (closeMenu)="closeActionsMenu()"
+                    [style.left.px]="menuPosition.x"
+                    [style.top.px]="menuPosition.y">
+                  </app-song-actions-menu>
+                </td>
               </tr>
             }
           </tbody>

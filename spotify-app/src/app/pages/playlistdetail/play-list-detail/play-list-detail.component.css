@@ -116,12 +116,12 @@
     background-color: rgba(255, 255, 255, 0.1);
   }
   
-  /* Imagen de la portada del álbum */
+
   .album-cover-image {
-    width: 3rem; /* Ajusta el tamaño de la imagen */
+    width: 3rem; 
     height: 3rem;
-    object-fit: cover; /* Hace que la imagen se recorte para llenar el contenedor */
-    border-radius: 4px; /* Redondea las esquinas de la imagen */
+    object-fit: cover; 
+    border-radius: 4px; 
   }
 
   .title-container{
@@ -169,4 +169,38 @@
   transform: translateY(0); 
   opacity: 1; 
 }
- 
+
+
+.icon-button-delete{
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.icon-button-delete:hover {
+  transform: translateY(-0.80rem);
+}
+
+.icon-button-options{
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.playlist-options-menu{
+  background: #161616;
+  box-shadow: 0 16px 24px rgba(0,0,0,.3), 0 6px 8px rgba(0,0,0,.2);
+  z-index: 1000;
+  min-width: 150px;
+  padding: 10px;
+}
+
+.delete-playlist{
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  color: #ffffff;
+}

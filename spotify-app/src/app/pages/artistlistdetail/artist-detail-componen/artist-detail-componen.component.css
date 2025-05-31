@@ -175,3 +175,14 @@
   transform: translateY(0); 
   opacity: 1; 
 }
+
+.options-button{
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.app-song-actions-menu {
+  position: fixed;
+  z-index: 1000;
+}

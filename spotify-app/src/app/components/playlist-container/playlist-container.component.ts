@@ -19,7 +19,7 @@ import { catchError, of, Subject, takeUntil } from 'rxjs';
   styleUrl: './playlist-container.component.css',
 })
 export class PlaylistContainerComponent {
-   private artistService = inject(ArtistService);
+  private artistService = inject(ArtistService);
   private playlistService = inject(PlaylistService);
   private authService = inject(AuthService);
   private destroy$ = new Subject<void>();
@@ -59,7 +59,6 @@ export class PlaylistContainerComponent {
     this.playlistService.playlistsUpdated$
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
-        console.log('Actualizando playlists...');
         this.loadAllPlaylists();
       });
   }
@@ -78,7 +77,6 @@ export class PlaylistContainerComponent {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (playlists) => {
-          console.log('Playlists del usuario:', playlists);
           this.userPlaylists.set(playlists);
         },
         error: (err) => console.error('Error loading user playlists:', err)
@@ -89,7 +87,6 @@ export class PlaylistContainerComponent {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (playlists) => {
-          console.log('Playlists comunitarias:', playlists);
           this.otherUsersPlaylists.set(playlists);
         },
         error: (err) => {

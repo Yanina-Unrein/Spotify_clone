@@ -1,19 +1,25 @@
 <div class="modal-overlay">
-    <div class="modal-content">
-      <button class="close-button" (click)="onCancel()">
-        <img src="/icons/Close.svg" alt="Cerrar">
-      </button>
-      <h2>Coloca el nombre de tu playlist</h2>
-      <input 
-        type="text" 
-        [(ngModel)]="playlistName" 
-        placeholder="Mi playlist"
-        class="playlist-input">
-      <button 
-        class="save-button" 
-        (click)="onSave()" 
-        [disabled]="!playlistName.trim() || isLoading">
-        {{ isLoading ? 'Guardando...' : 'Guardar' }}
-      </button>
+  <div class="modal-content">
+    <button class="close-button" (click)="onCancel()">
+      <img src="/icons/Close.svg" alt="Cerrar">
+    </button>
+    <h2>Coloca el nombre de tu playlist</h2>
+    <input 
+      type="text" 
+      [(ngModel)]="playlistName" 
+      placeholder="Mi playlist"
+      class="playlist-input"
+      (keyup.enter)="onSave()">
+    
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
     </div>
+    
+    <button 
+      class="save-button" 
+      (click)="onSave()" 
+      [disabled]="!playlistName.trim() || isLoading">
+      {{ isLoading ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </div>
 </div>

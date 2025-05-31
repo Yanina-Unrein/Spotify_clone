@@ -115,6 +115,10 @@ form{
     cursor: pointer;
 }
 
+.forgot-password{
+    text-align: center;
+}
+
 /* Estilos del modal */
 .modal-backdrop {
     position: fixed;

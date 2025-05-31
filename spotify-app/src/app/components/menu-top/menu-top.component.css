@@ -162,38 +162,31 @@ input::placeholder{
     margin-bottom: 4px;
 }
 
-.user-email {
+.user-email, .user-perfil {
     display: block;
     color: #b3b3b3;
     font-size: 0.875rem;
 }
 
-.menu-items {
-    padding: 8px 0;
+.user-perfil{
+    padding-top: 15px;
+    cursor: pointer;
 }
 
-.menu-items a,
-.menu-items button {
-    display: block;
-    padding: 8px 16px;
-    width: 100%;
-    text-align: left;
+.user-perfil:hover {
+    background: #585858;
+    text-decoration: underline;
+}
+
+.logout-button{
     background: none;
     border: none;
-    color: white;
+    color: #b3b3b3;
     font-size: 0.875rem;
     cursor: pointer;
-    text-decoration: none;
+    padding: 10px 16px;
 }
 
-.menu-items a:hover,
-.menu-items button:hover {
+.logout-container:hover {
     background: #404040;
-}
-
-.logout-button {
-    color: #ff5555 !important;
-    border-top: 1px solid #404040;
-    margin-top: 8px;
-    padding-top: 12px;
 }
