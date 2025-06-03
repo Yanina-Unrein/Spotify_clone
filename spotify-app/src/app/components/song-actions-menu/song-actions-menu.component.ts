@@ -124,5 +124,6 @@ export class SongActionsMenuComponent {
       playlist.title.toLowerCase().includes(this.searchQuery.toLowerCase())
     );
   }
+  
 }
 

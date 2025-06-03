@@ -1,92 +1,168 @@
 .song-card {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    padding: 12px;
-    border-radius: 8px;
-  }
-  
-  .column {
-    display: flex;
-    justify-content: center;
-    justify-content: center;
-  }
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 8px;
+  position: relative;
+}
 
-  .play-card-button-container{
-    position: relative;
-  }
+.song-card:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
 
-  .play-card-button{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translateY(1rem); 
-    opacity: 0;
-    transition: all 0.5s ease;
-    z-index: 10; 
-    background: #ffffff;
-  }
+.song-card.current {
+  background-color: rgba(30, 215, 96, 0.1);
+}
 
-  .play-card-button-container .play-card-button:hover {
-    transform: translateY(0); 
-    opacity: 1; 
-  }
-  
-  .image-column {
-    justify-content: flex-start;
-  }
-  
-  .album-cover-image {
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
-  }
-  
-  .details-column {
-    flex-direction: column;
-    gap: 5px;
-  }
-  
-  .song-title {
-    font-weight: 400;
-    font-size: 1rem;
-    color: #fff;
-    margin: 0;
-  }
-  
-  .song-artists {
-    font-weight: 400;
-    font-size: 0.95rem;
-    color: #b3b3b3;
-    margin: 0;
-  }
-  
-  .duration-column {
-    justify-content: flex-start;
-  }
-  
-  .song-duration {
-    font-weight: 400;
-    font-size: 0.95rem;
-    color: #b3b3b3;
-  }
-  
-  .actions-column {
-    flex-direction: row;
-    justify-content: flex-start;
-  }
-  
-  .action-button {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: transform 0.3s ease;
-  }
-  
-  .action-button:hover {
-    transform: translateY(-5px);
-  }
-  
+.column {
+  display: flex;
+  justify-content: center;
+}
+
+.play-card-button-container {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.album-cover-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.play-card-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateY(1rem);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.play-card-button-container:hover .play-card-button {
+  transform: translate(-50%, -50%) translateY(0);
+  opacity: 1;
+}
+
+.details-column {
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  min-width: 0;
+}
+
+.song-title {
+  font-weight: 400;
+  font-size: 1rem;
+  color: #fff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.song-artists {
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: #b3b3b3;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.duration-column {
+  width: 60px;
+}
+
+.song-duration {
+  font-weight: 400;
+  font-size: 0.95rem;
+  color: #b3b3b3;
+}
+
+.actions-column {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.action-button-container {
+  position: relative;
+  display: inline-block;
+}
+
+.action-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.action-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+.action-button.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.action-button.disabled:hover {
+  transform: none;
+  background-color: transparent;
+}
+
+.action-button img {
+  width: 16px;
+  height: 16px;
+}
+
+/* Estilos para el tooltip */
+.login-tooltip {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #282828;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  animation: fadeIn 0.2s ease-out;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.tooltip-arrow {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #282828;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, 5px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}

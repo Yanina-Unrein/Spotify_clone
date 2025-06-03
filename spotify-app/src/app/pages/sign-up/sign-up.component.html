@@ -16,8 +16,16 @@
                 formControlName="first_name"
                 [class.is-invalid]="registrationForm.get('first_name')?.invalid && registrationForm.get('first_name')?.touched"
               />
-              <div *ngIf="registrationForm.get('first_name')?.invalid && registrationForm.get('first_name')?.touched" class="invalid-feedback">
-                El nombre es obligatorio y debe tener al menos 2 caracteres.
+              <div *ngIf="registrationForm.get('first_name')?.touched">
+                <div *ngIf="registrationForm.get('first_name')?.hasError('required')" class="invalid-feedback">
+                  El nombre es obligatorio.
+                </div>
+                <div *ngIf="registrationForm.get('first_name')?.hasError('minlength')" class="invalid-feedback">
+                  El nombre debe tener al menos 2 caracteres.
+                </div>
+                <div *ngIf="registrationForm.get('first_name')?.hasError('lettersOnly')" class="invalid-feedback">
+                  El nombre solo puede contener letras y espacios.
+                </div>
               </div>
             </div>
         
@@ -30,8 +38,16 @@
                 formControlName="last_name"
                 [class.is-invalid]="registrationForm.get('last_name')?.invalid && registrationForm.get('last_name')?.touched"
               />
-              <div *ngIf="registrationForm.get('last_name')?.invalid && registrationForm.get('last_name')?.touched" class="invalid-feedback">
-                El apellido es obligatorio y debe tener al menos 2 caracteres.
+              <div *ngIf="registrationForm.get('last_name')?.touched">
+                <div *ngIf="registrationForm.get('last_name')?.hasError('required')" class="invalid-feedback">
+                  El nombre es obligatorio.
+                </div>
+                <div *ngIf="registrationForm.get('last_name')?.hasError('minlength')" class="invalid-feedback">
+                  El nombre debe tener al menos 2 caracteres.
+                </div>
+                <div *ngIf="registrationForm.get('last_name')?.hasError('lettersOnly')" class="invalid-feedback">
+                  El nombre solo puede contener letras y espacios.
+                </div>
               </div>
             </div>
         
@@ -56,16 +72,15 @@
                 id="email"
                 class="form-control"
                 formControlName="email"
-                [class.is-invalid]="registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched"
-                />
+                [class.is-invalid]="(registrationForm.get('email')?.invalid && registrationForm.get('email')?.touched) || registrationForm.get('email')?.hasError('emailExists')"/>
                 <div *ngIf="registrationForm.get('email')?.hasError('required') && registrationForm.get('email')?.touched" class="invalid-feedback">
                   El correo es obligatorio.
                 </div>
               <div *ngIf="registrationForm.get('email')?.hasError('email') && registrationForm.get('email')?.touched" class="invalid-feedback">
                 <span>&#9888; Este correo electrónico no es válido. Asegúrate de que tenga un formato como este: ejemplo&#64;email.com</span>
               </div>
-              <div *ngIf="registrationForm.get('email')?.hasError('emailExists') && registrationForm.get('email')?.touched" class="emailExists">
-                &#9888; Esta dirección ya está vinculada a una cuenta. Para continuar, <a [routerLink]="['login']">inicia sesión</a>.
+               <div *ngIf="registrationForm.get('email')?.hasError('emailExists')" class="emailExists">
+                &#9888; Esta dirección ya está vinculada a una cuenta. Para continuar, <a [routerLink]="['/login']">inicia sesión</a>.
               </div>
             </div>
             <div class="mb-3">
@@ -109,4 +124,12 @@
             Privacy Policy and Terms of Service apply.
         </span>
     </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal" [class.success]="isSuccess" [class.error]="!isSuccess">
+    <h2>{{ modalTitle }}</h2>
+    <p>{{ modalMessage }}</p>
+    <button (click)="closeModal()">Aceptar</button>
+  </div>
 </div>

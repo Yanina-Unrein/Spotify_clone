@@ -10,9 +10,10 @@ import {
   TokenValidationResponse,
   ResetPasswordData
 } from '@/app/models/UserModel';
-import { catchError, tap, throwError, of } from 'rxjs';
+import { catchError, tap, throwError, of, Observable } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
+import { ApiError, FieldError, RegisterData, RegisterResponse } from '@/app/models/Register';
 
 @Injectable({
   providedIn: 'root'
@@ -40,16 +41,10 @@ export class AuthService {
     }
   }
 
-  register(userData: { 
-    first_name: string; 
-    last_name: string; 
-    username: string;
-    email: string; 
-    password: string 
-  }) {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData).pipe(
-      tap((response) => this.handleAuthentication(response)),
-      catchError(this.handleError)
+  register(userData: RegisterData): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${this.apiUrl}/registrarse`, userData).pipe(
+      tap((response: RegisterResponse) => this.handleAuthentication(response)),
+      catchError((error: HttpErrorResponse) => this.handleRegisterError(error)) 
     );
   }
 
@@ -67,6 +62,17 @@ export class AuthService {
     }
     this._currentUser.set(null);
     this.router.navigate(['/login']);
+  }
+
+  checkEmailExists(email: string): Observable<{ exists: boolean }> {
+    console.log('🔍 Verificando email:', email); // Log para debug
+    return this.http.post<{ exists: boolean }>(`${this.apiUrl}/check-email`, { email }).pipe(
+      tap(response => console.log('📊 Respuesta del servidor:', response)), // Log para debug
+      catchError((error) => {
+        console.error('❌ Error checking email:', error);
+        return of({ exists: false }); // Si hay error, asumimos que no existe
+      })
+    );
   }
 
   private handleAuthentication(response: AuthResponse): void {
@@ -121,6 +127,54 @@ export class AuthService {
     return throwError(() => ({ 
       message: errorMessage,
       status: error.status 
+    }));
+  }
+
+  private handleRegisterError(error: HttpErrorResponse): Observable<never> {
+   console.error('Error del servidor:', error);
+  
+    let errorMessage = 'Ocurrió un error en el registro';
+    const fieldErrors: FieldError[] = [];
+
+    // Manejo especial para error de email existente
+    if (error.status === 400 || error.status === 409) {
+      if (error.error?.error?.includes('ya está en uso')) {
+        return throwError(() => ({
+          message: 'El email ya está registrado',
+          status: error.status,
+          fieldErrors: [{ field: 'email', message: 'Esta dirección ya está vinculada a una cuenta' }],
+          rawError: error,
+          isEmailExists: true // Nueva propiedad para identificar este error específico
+        }));
+      }
+    }
+
+    // Manejo genérico de otros errores
+    if (error.error) {
+      if (typeof error.error === 'string') {
+        errorMessage = error.error;
+      } else if (error.error.message) {
+        errorMessage = error.error.message;
+      } else if (error.error.error) {
+        errorMessage = error.error.error;
+      }
+
+      // Procesar errores de validación
+      if (error.error.errors) {
+        Object.entries(error.error.errors).forEach(([field, messages]) => {
+          fieldErrors.push({
+            field,
+            message: Array.isArray(messages) ? messages.join(' ') : String(messages)
+          });
+        });
+      }
+    }
+
+    return throwError(() => ({
+      message: errorMessage,
+      status: error.status,
+      fieldErrors,
+      rawError: error
     }));
   }
 }

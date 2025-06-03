@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, inject, OnDestroy, OnInit, Output } from '@angular/core';
 import { CardArtistComponent } from '../../card-artist/card-artist.component';
 import { CardPlayListComponent } from '../../card-play-list/card-play-list.component';
 import { CommonModule } from '@angular/common';
@@ -9,6 +9,10 @@ import { ArtistService } from '@/app/services/artist/artist.service';
 import { PlaylistService } from '@/app/services/playlist/playlist.service';
 import { SearchService } from '@/app/services/search/seach.service';
 import { combineLatest, map, Subject, takeUntil } from 'rxjs';
+import { Playlist } from '@/app/models/PlaylistModel';
+import { Artist } from '@/app/models/ArtistModel';
+import { Song } from '@/app/models/SongModel';
+import { PlayerService } from '@/app/services/player/player.service';
 
 @Component({
   selector: 'app-search',
@@ -18,14 +22,15 @@ import { combineLatest, map, Subject, takeUntil } from 'rxjs';
   styleUrl: './search.component.css'
 })
 export class SearchComponent implements OnInit, OnDestroy {
- private route = inject(ActivatedRoute);
+  private route = inject(ActivatedRoute);
   private searchService = inject(SearchService);
   private songService = inject(SongService);
   private artistService = inject(ArtistService);
   private playlistService = inject(PlaylistService);
+  private playerService = inject(PlayerService);
   private destroy$ = new Subject<void>();
 
-  // Accedemos a las señales del servicio
+  // Signals del search service
   searchQuery = this.searchService.searchQuery;
   songs = this.searchService.songs;
   artists = this.searchService.artists;
@@ -33,16 +38,10 @@ export class SearchComponent implements OnInit, OnDestroy {
   isLoading = this.searchService.isLoading;
   hasResults = this.searchService.hasResults;
 
-
-  constructor() {
-    this.route.queryParams.subscribe(params => {
-      if (params['q']) {
-        this.search(params['q']);
-      } else {
-        this.searchService.clearResults();
-      }
-    });
-  }
+  // Signals del player service
+  currentSong = this.playerService.currentSong;
+  isPlaying = this.playerService.isPlaying;
+  currentPlaylistId = this.playerService.currentPlaylistId;
 
   ngOnInit() {
     this.route.queryParams.pipe(
@@ -67,51 +66,41 @@ export class SearchComponent implements OnInit, OnDestroy {
     combineLatest([
       this.songService.searchSongs(query),
       this.artistService.searchArtistsByName(query),
-      this.playlistService.getPlaylistsByUser(1)
+      this.playlistService.getPlaylistsByUser(1) // Asume userId 1 o ajusta según tu lógica
     ]).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: ([songs, artists, playlists]) => {
+      takeUntil(this.destroy$),
+      map(([songs, artists, playlists]) => {
+        // Filtra playlists que coincidan con la búsqueda
         const filteredPlaylists = playlists.filter(playlist => 
-          this.searchService.fuzzySearch(playlist.title, query)
+          playlist.title.toLowerCase().includes(query.toLowerCase())
         );
+        return { songs, artists, filteredPlaylists };
+      })
+    ).subscribe({
+      next: ({ songs, artists, filteredPlaylists }) => {
         this.searchService.setResults(songs, artists, filteredPlaylists);
       },
       error: (err) => {
         console.error('Error en la búsqueda:', err);
         this.searchService.setLoading(false);
-        this.searchService.setResults([], [], []); 
+        this.searchService.setResults([], [], []);
       }
     });
   }
 
-  search(query: string): void {
-    if (!query.trim()) {
-      this.searchService.clearResults();
-      return;
+  // Métodos para manejar la reproducción
+  playSong(song: Song): void {
+    if (this.isCurrentSong(song) && this.isPlaying()) {
+      this.playerService.pause();
+    } else if (this.isCurrentSong(song)) {
+      this.playerService.togglePlay();
+    } else {
+      this.playerService.playSong(song);
     }
+  }
 
-    this.searchService.setLoading(true);
-    this.searchService.updateSearch(query);
-
-    // Usamos los métodos existentes de búsqueda
-    combineLatest([
-      this.songService.searchSongs(query),
-      this.artistService.searchArtistsByName(query),
-      this.playlistService.getPlaylistsByUser(1).pipe(
-        map(playlists => playlists.filter(playlist => 
-          this.searchService.fuzzySearch(playlist.title, query)
-        ))
-      )
-    ]).subscribe({
-      next: ([songs, artists, playlists]) => {
-        this.searchService.setResults(songs, artists, playlists);
-      },
-      error: (err) => {
-        console.error('Error en la búsqueda:', err);
-        this.searchService.setLoading(false);
-        this.searchService.setResults([], [], []); 
-      }
-    });
+  // Métodos de verificación de estado
+  isCurrentSong(song: Song): boolean {
+    return this.currentSong()?.id === song.id;
   }
 }

@@ -12,6 +12,12 @@ h2{
     color: #ffffff;
 }
 
+p{
+    font-size: 1rem;
+    font-weight: 400;
+    color: #b3b3b3;
+}
+
 .container-search{
     display: flex;
     flex-direction: column;

@@ -7,7 +7,14 @@
             <h2>Canciones</h2>
             @if (songs().length) {
                 <div class="song-card-container">
-                    <app-song-view *ngFor="let song of songs()" [song]="song"></app-song-view>
+                   @for (song of songs(); track song.id) {
+                        <app-song-view 
+                            *ngFor="let song of songs()"
+                            [song]="song"
+                            [isCurrent]="isCurrentSong(song)"
+                            [isPlaying]="isCurrentSong(song) && isPlaying()">
+                        </app-song-view>
+                    }
                 </div>
             } @else {
                 <p>No se encontraron canciones.</p>
@@ -18,7 +25,11 @@
             <h2>Artistas</h2>
             @if (artists().length) {
                 <div class="card-container">
-                    <app-card-artist *ngFor="let artist of artists()" [artist]="artist"></app-card-artist>
+                    @for (artist of artists(); track artist.id) {
+                        <app-card-artist 
+                            [artist]="artist">
+                        </app-card-artist>
+                    }
                 </div>
             } @else {
                 <p>No se encontraron artistas.</p>
@@ -27,13 +38,17 @@
 
         <div class="container-search">
             <h2>Playlists</h2>
-            @if (playlists().length) {
-                <div class="card-container">
-                    <app-card-play-list *ngFor="let playlist of playlists()" [playlist]="playlist"></app-card-play-list>
-                </div>
-            } @else {
-                <p>No se encontraron playlists.</p>
-            }
+             @if (playlists().length) {
+            <div class="card-container">
+                @for (playlist of playlists(); track playlist.id) {
+                    <app-card-play-list 
+                        [playlist]="playlist">
+                    </app-card-play-list>
+                }
+            </div>
+        } @else {
+            <p>No se encontraron playlists.</p>
+        }
         </div>
     }
     @else if (searchQuery()) {

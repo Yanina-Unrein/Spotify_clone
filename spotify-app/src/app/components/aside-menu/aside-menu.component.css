@@ -35,3 +35,7 @@ div.spotify__side-bar__card-container{
   background-color: #27272a;
 }
 
+.empty-message{
+  color: #b3b3b3;
+  font-size: 1rem;
+}

@@ -1,4 +1,4 @@
-<div class="song-card">
+<div class="song-card" [class.current]="isCurrent && isPlaying">
     <div class="column image-column play-card-button-container">
       <img 
         [src]="song.image_path"
@@ -6,13 +6,17 @@
         class="album-cover-image"
       />
       <div class="play-card-button">
-        <app-button-play-small [song]="song"></app-button-play-small>
+        <app-button-play-small 
+          [song]="song"
+          [playlistId]="playlistId"
+          [playlistSongs]="playlistSongs">
+        </app-button-play-small>
       </div>
     </div>
   
     <div class="column details-column">
       <h3 class="song-title">{{ song.title }}</h3>
-      <h4 class="song-artists">{{ getArtistsString(song) }}</h4>
+      <h4 class="song-artists">{{ getArtistName() }}</h4>
     </div>
   
     <div class="column duration-column">
@@ -20,12 +24,47 @@
     </div>
   
     <div class="column actions-column">
-      <button (click)="addToPlaylist(song)" class="action-button">
-        <img src="/icons/Add_icon.svg" alt="Agregar a playlist">
-      </button>
-      <button (click)="toggleFavorite(song)" class="action-button">
-        <img *ngIf="!isFavorite" src="/icons/Heart_favorite.svg" alt="Agregar a favoritos" />
-        <img *ngIf="isFavorite" src="/icons/Heart_Fill.svg" alt="Favorito" />
-      </button>
+      <div class="action-button-container">
+        <button 
+          (click)="openAddToPlaylistMenu(song, $event)" 
+          (mouseenter)="!authService.currentUser() && showTooltip('playlist', $event)"
+          (mouseleave)="hideTooltip()"
+          class="action-button"
+          [class.disabled]="!authService.currentUser()">
+          <img src="/icons/Add_icon.svg" alt="Agregar a playlist">
+        </button>
+        <div 
+          *ngIf="showLoginTooltip && !authService.currentUser() && hoveredButton === 'playlist'"
+          class="login-tooltip">
+          {{ tooltipMessage }}
+          <div class="tooltip-arrow"></div>
+        </div>
+      </div>
+      
+      <app-song-actions-menu 
+        *ngIf="showActionsMenu && selectedSong?.id === song.id"
+        [song]="song"
+        (closeMenu)="closeActionsMenu()"
+        [style.left.px]="menuPosition.x"
+        [style.top.px]="menuPosition.y">
+      </app-song-actions-menu>
+      
+      <div class="action-button-container">
+        <button 
+          (click)="toggleFavorite(song, $event)" 
+          (mouseenter)="!authService.currentUser() && showTooltip('favorite', $event)"
+          (mouseleave)="hideTooltip()"
+          class="action-button"
+          [class.disabled]="!authService.currentUser()">
+          <img *ngIf="!isFavorite" src="/icons/Heart_favorite.svg" alt="Agregar a favoritos" />
+          <img *ngIf="isFavorite" src="/icons/Heart_Fill.svg" alt="Favorito" />
+        </button>
+        <div 
+          *ngIf="showLoginTooltip && !authService.currentUser() && hoveredButton === 'favorite'"
+          class="login-tooltip">
+          {{ tooltipMessage }}
+          <div class="tooltip-arrow"></div>
+        </div>
+      </div>
     </div>
-  </div>
+</div>

@@ -69,27 +69,45 @@ export class PlaylistContainerComponent {
   }
 
   private loadAllPlaylists(): void {
-    const userId = this.currentUser()?.id;
-    if (!userId) return;
+    const user = this.currentUser();
 
-    // Cargar playlists del usuario actual
+    if (!user) {
+      this.playlistService.getOtherUsersPlaylists(0)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (playlists: Playlist[]) => {
+            this.otherUsersPlaylists.set(playlists);
+            this.userPlaylists.set([]); 
+          },
+          error: (err: any) => {
+            console.error('Error loading public playlists:', err);
+            this.otherUsersPlaylists.set([]);
+          }
+        });
+
+      return;
+    }
+
+    const userId = user.id;
+
+    // Cargar playlists del usuario
     this.playlistService.getPlaylistsByUser(userId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (playlists) => {
+        next: (playlists: Playlist[]) => {
           this.userPlaylists.set(playlists);
         },
-        error: (err) => console.error('Error loading user playlists:', err)
+        error: (err: any) => console.error('Error loading user playlists:', err)
       });
 
-    // Cargar playlists comunitarias
+    // Cargar playlists de otros usuarios
     this.playlistService.getOtherUsersPlaylists(userId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (playlists) => {
+        next: (playlists: Playlist[]) => {
           this.otherUsersPlaylists.set(playlists);
         },
-        error: (err) => {
+        error: (err: any) => {
           console.error('Error loading community playlists:', err);
           this.otherUsersPlaylists.set([]);
         }
