@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from '@/environments/environment';
 import { 
@@ -176,5 +176,47 @@ export class AuthService {
       fieldErrors,
       rawError: error
     }));
+  }
+
+  getToken(): string | null {
+  if (isPlatformBrowser(this.platformId)) {
+    return localStorage.getItem('token');
+  }
+  return null;
+}
+
+// Método para verificar si el token está expirado
+isTokenExpired(): boolean {
+  const token = this.getToken();
+  if (!token) return true;
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp < Date.now() / 1000;
+  } catch (e) {
+    return true;
+  }
+}
+
+// Método para refrescar el token si es necesario
+refreshToken(): Observable<AuthResponse> {
+  return this.http.post<AuthResponse>(`${this.apiUrl}/refresh-token`, {}).pipe(
+    tap(response => this.handleAuthentication(response)),
+    catchError(error => {
+      this.logout();
+      return throwError(() => error);
+    })
+  );
+}
+
+  // Método para obtener los headers de autenticación
+  getAuthHeaders(): { headers: HttpHeaders } {
+    const token = this.getToken();
+    return {
+      headers: new HttpHeaders({
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      })
+    };
   }
 }

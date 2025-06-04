@@ -9,7 +9,7 @@ import { PlaylistService } from '@/app/services/playlist/playlist.service';
 import { AuthService } from '@/app/services/auth/auth.service';
 import { Playlist } from '@/app/models/PlaylistModel';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { catchError, of, Subject, takeUntil } from 'rxjs';
+import { catchError, forkJoin, of, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-playlist-container',
@@ -69,49 +69,36 @@ export class PlaylistContainerComponent {
   }
 
   private loadAllPlaylists(): void {
-    const user = this.currentUser();
-
-    if (!user) {
+    if (!this.authService.isAuthenticated()) {
+      // Carga solo playlists públicas
       this.playlistService.getOtherUsersPlaylists(0)
         .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (playlists: Playlist[]) => {
-            this.otherUsersPlaylists.set(playlists);
-            this.userPlaylists.set([]); 
-          },
-          error: (err: any) => {
-            console.error('Error loading public playlists:', err);
-            this.otherUsersPlaylists.set([]);
-          }
+        .subscribe(playlists => {
+          this.otherUsersPlaylists.set(playlists);
+          this.userPlaylists.set([]);
         });
-
       return;
     }
 
-    const userId = user.id;
+    const user = this.currentUser();
+    if (!user) return;
 
-    // Cargar playlists del usuario
-    this.playlistService.getPlaylistsByUser(userId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (playlists: Playlist[]) => {
-          this.userPlaylists.set(playlists);
-        },
-        error: (err: any) => console.error('Error loading user playlists:', err)
-      });
-
-    // Cargar playlists de otros usuarios
-    this.playlistService.getOtherUsersPlaylists(userId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (playlists: Playlist[]) => {
-          this.otherUsersPlaylists.set(playlists);
-        },
-        error: (err: any) => {
-          console.error('Error loading community playlists:', err);
-          this.otherUsersPlaylists.set([]);
-        }
-      });
+    // Carga ambas listas para usuarios autenticados
+    forkJoin([
+      this.playlistService.getPlaylistsByUser(user.id),
+      this.playlistService.getOtherUsersPlaylists(user.id)
+    ]).pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: ([userPlaylists, otherPlaylists]) => {
+        this.userPlaylists.set(userPlaylists);
+        this.otherUsersPlaylists.set(otherPlaylists);
+      },
+      error: (err) => {
+        console.error('Error loading playlists:', err);
+        this.userPlaylists.set([]);
+        this.otherUsersPlaylists.set([]);
+      }
+    });
   }
 
   onCardClick(playlist: Playlist): void {
