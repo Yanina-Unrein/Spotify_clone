@@ -10,74 +10,88 @@ import { SearchService } from '../search/seach.service';
   providedIn: 'root'
 })
 export class SongService {
-  private apiUrl = `${environment.apiUrl}/songs`;
-  private baseUrl = environment.apiUrl;
+ private apiUrl = `${environment.apiUrl}/songs`;
   private http = inject(HttpClient);
   private searchService = inject(SearchService);
 
-  // Obtener todas las canciones con signal
+  // Método mejorado para obtener todas las canciones
   getAllSongs() {
     return toSignal(
-      this.http.get<Song[]>(this.apiUrl),
+      this.http.get<Song[]>(this.apiUrl).pipe(
+        map(songs => songs.map(song => this.processSong(song)))
+      ),
       { initialValue: [] }
     );
   }
 
-  // Obtener canción por ID con signal
+  // Método mejorado para obtener canción por ID
   getSongById(id: number) {
     return toSignal(
-      this.http.get<Song>(`${this.apiUrl}/${id}`)
+      this.http.get<Song>(`${this.apiUrl}/${id}`).pipe(
+        map(song => this.processSong(song))
+      )
     );
   }
 
-  // Buscar canciones con signal
+  // Método mejorado para buscar canciones
   searchSongs(query: string): Observable<Song[]> {
     const normalizedQuery = this.normalizeSearchText(query);
     
     return this.http.get<Song[]>(`${this.apiUrl}/search`).pipe(
-      map(songs => {
-        // Primero aplicamos el mapeo base
-        const mappedSongs = songs.map(song => this.addBaseUrl(song));
-        
-        // Luego filtramos con búsqueda avanzada
-        return mappedSongs.filter(song => 
-          this.matchSong(song, normalizedQuery)
-        );
-      })
-    );
+      map(songs => songs.map(song => this.processSong(song))),
+      map(songs => songs.filter(song => this.matchSong(song, normalizedQuery))
+    ));
   }
 
-  // Método para normalizar texto de búsqueda
+  // Procesamiento consistente de las canciones
+  private processSong(song: Song): Song {
+    return {
+      ...song,
+      path_song: this.buildSongUrl(song.path_song)
+    };
+  }
+
+  // Construcción robusta de la URL
+  private buildSongUrl(path: string | undefined): string {
+    if (!path) return '';
+    
+    // Si ya es una URL completa, retornarla tal cual
+    if (path.startsWith('http')) return path;
+    
+    // Eliminar barras iniciales duplicadas
+    const cleanPath = path.replace(/^\/*/, '');
+    
+    // Construir URL completa
+    return `${environment.apiUrl.replace(/\/+$/, '')}/${cleanPath}`;
+  }
+
   private normalizeSearchText(text: string): string {
     return text
       .toLowerCase()
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // Elimina acentos
+      .replace(/[\u0300-\u036f]/g, "")
       .trim();
   }
 
-  // Método para verificar coincidencias
   private matchSong(song: PlayableSong, query: string): boolean {
-    // Busca en el título
     const normalizedTitle = this.normalizeSearchText(song.title);
     if (normalizedTitle.includes(query)) return true;
     
-    // Busca en el nombre del artista (si existe)
     if (song.artist_name) {
       const normalizedArtist = this.normalizeSearchText(song.artist_name);
       if (normalizedArtist.includes(query)) return true;
     }
     
-    // Busca en cada palabra del título
     const titleWords = normalizedTitle.split(/\s+/);
     if (titleWords.some(word => word.includes(query))) return true;
     
     return false;
   }
 
+
   private addBaseUrl(song: Song): Song {
     if (song.path_song) {
-      song.path_song = this.baseUrl + song.path_song;
+      song.path_song = this.apiUrl + song.path_song;
     }
     return song;
   }
