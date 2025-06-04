@@ -142,23 +142,28 @@ export class PlayerService {
 }
 
   private getValidAudioUrl(path: string): string {
-    // Si ya es una URL completa (http/https), usarla directamente
-    if (path.startsWith('http://') || path.startsWith('https://')) {
+    if (!path) {
+      console.error('Path no proporcionado');
+      return '';
+    }
+
+    // Si ya es una URL completa
+    if (path.startsWith('http')) {
       return path;
     }
 
-    // Limpiar la ruta de prefijos no deseados
+    // Construir URL base correctamente
+    const baseUrl = environment.apiUrl
+      .replace(/\/api$/, '') // Eliminar /api final si existe
+      .replace(/\/+$/, ''); // Eliminar barras finales
+
+    // Limpiar el path de la canción
     const cleanPath = path
-      .replace(/^\/?(api\/|public\/|songs\/)/, '') // Eliminar prefijos comunes
-      .replace(/^\//, ''); // Eliminar slash inicial
+      .replace(/^\/+/, '') // Eliminar barras iniciales
+      .replace(/^public\/|^songs\//, ''); // Eliminar prefijos comunes
 
-    // Construir URL base sin /api
-    const baseUrl = environment.apiUrl.replace('/api', '');
-
-    // Si no tiene extensión, asumir .mp3
-    const finalPath = /\.\w+$/.test(cleanPath) ? cleanPath : `${cleanPath}.mp3`;
-
-    return `${baseUrl}/public/songs/${finalPath}`;
+    // URL final corregida
+    return `${baseUrl}/public/songs/${cleanPath}`;
   }
 
 

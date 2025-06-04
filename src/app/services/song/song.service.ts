@@ -58,11 +58,15 @@ export class SongService {
     // Si ya es una URL completa, retornarla tal cual
     if (path.startsWith('http')) return path;
     
-    // Eliminar barras iniciales duplicadas
+    // Asegurar que environment.apiUrl tenga el formato correcto
+    const baseUrl = environment.apiUrl
+      .replace(/\/+$/, '') // Eliminar barras finales
+      .replace(/^https:\//, 'https://'); // Corregir errores de formato
+    
+    // Limpiar el path de la canción
     const cleanPath = path.replace(/^\/*/, '');
     
-    // Construir URL completa
-    return `${environment.apiUrl.replace(/\/+$/, '')}/${cleanPath}`;
+    return `${baseUrl}/public/songs/${cleanPath}`;
   }
 
   private normalizeSearchText(text: string): string {
