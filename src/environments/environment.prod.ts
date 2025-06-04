@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://apispoty.onrender.com'
+  apiUrl: 'https://apispoty.onrender.com/api'
 };
