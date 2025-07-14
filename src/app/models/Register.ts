@@ -25,4 +25,5 @@ export interface ApiError {
 export interface RegisterResponse {
   token: string;
   user: User;
+  refreshToken: string;
 }

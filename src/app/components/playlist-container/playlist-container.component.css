@@ -20,6 +20,6 @@
     padding-bottom: 30px;
 }
 
-h2{
+h2, .empty-message {
     color: #ffffff;
 }
