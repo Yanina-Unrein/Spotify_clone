@@ -1,79 +1,134 @@
-import { 
-  HttpInterceptorFn, 
-  HttpRequest, 
-  HttpHandlerFn, 
-  HttpEvent, 
-  HttpErrorResponse, 
-  HttpStatusCode 
+import {
+  HttpInterceptorFn,
+  HttpRequest,
+  HttpHandlerFn,
+  HttpEvent,
+  HttpErrorResponse,
+  HttpStatusCode
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '@/app/services/auth/auth.service';
-import { catchError, switchMap, throwError, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, switchMap, filter, take } from 'rxjs/operators';
+
+// Estado compartido del interceptor
+let interceptorState = {
+  isRefreshing: false,
+  refreshTokenSubject: new BehaviorSubject<string | null>(null)
+};
+
+// Definir rutas públicas (basado en las rutas de tu aplicación)
+const PUBLIC_PATHS = [
+  '/playlist/',
+  '/artist/',
+  '/buscar',
+  '/', // raíz
+  '/registrarse',
+  '/login',
+  '/reset-password'
+];
 
 export const authInterceptor: HttpInterceptorFn = (
-  req: HttpRequest<unknown>, 
+  req: HttpRequest<unknown>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
-  // No interceptar solicitudes de autenticación
-  if (req.url.includes('/auth/')) {
+  // Ignorar solicitudes de assets
+  if (req.url.includes('assets/')) {
     return next(req);
   }
 
-  // Clonar la solicitud y añadir el token si está disponible
-  const authReq = addTokenToRequest(req, authService.getToken());
+  const token = authService.getToken();
+  let authReq = req;
+
+  // Agregar token si existe
+  if (token) {
+    authReq = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+  }
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Manejar errores 401 (No autorizado)
-      if (error.status === HttpStatusCode.Unauthorized) {
-        return handleUnauthorizedError(authReq, next, authService, router);
+      // Determinar si es una ruta pública
+      const isPublic = PUBLIC_PATHS.some(path => req.url.includes(path));
+      
+      if (error.status === HttpStatusCode.Unauthorized || 
+          error.status === HttpStatusCode.Forbidden) {
+        
+        // No redirigir si no hay token o es ruta pública
+        if (!token || isPublic) {
+          return throwError(() => error);
+        }
+        
+        // Manejar error de autenticación para rutas privadas
+        return handleAuthError(req, next, authService, router);
       }
       return throwError(() => error);
     })
   );
 };
 
-// Función auxiliar para añadir token a la solicitud
-function addTokenToRequest(
-  req: HttpRequest<unknown>, 
-  token: string | null
-): HttpRequest<unknown> {
-  return token 
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-    : req;
-}
-
-// Función para manejar errores 401
-function handleUnauthorizedError(
+function handleAuthError(
   req: HttpRequest<unknown>,
   next: HttpHandlerFn,
   authService: AuthService,
   router: Router
 ): Observable<HttpEvent<unknown>> {
-  // Si no hay token, redirigir a login
-  if (!authService.getToken()) {
-    authService.logout();
-    router.navigate(['/login']);
-    return throwError(() => new Error('No autenticado'));
+  const state = interceptorState;
+
+  if (state.isRefreshing) {
+    return state.refreshTokenSubject.pipe(
+      filter(token => token !== null),
+      take(1),
+      switchMap(token => {
+        return retryRequest(req, token, next);
+      })
+    );
   }
 
-  // Intentar refrescar el token
+  state.isRefreshing = true;
+  state.refreshTokenSubject.next(null);
+
+  const refreshToken = localStorage.getItem('refresh_token');
+
+  if (!refreshToken) {
+    authService.logout();
+    router.navigate(['/login']);
+    return throwError(() => new Error('No refresh token'));
+  }
+
   return authService.refreshToken().pipe(
-    switchMap(() => {
-      // Reintentar la solicitud original con el nuevo token
-      const newToken = authService.getToken();
-      const newRequest = addTokenToRequest(req, newToken);
-      return next(newRequest);
+    switchMap((tokens: any) => {
+      authService.setTokens(tokens.token, tokens.refreshToken);
+      state.isRefreshing = false;
+      state.refreshTokenSubject.next(tokens.token);
+      return retryRequest(req, tokens.token, next);
     }),
-    catchError((refreshError) => {
-      // Si falla el refresco, cerrar sesión
+    catchError((err) => {
+      state.isRefreshing = false;
       authService.logout();
       router.navigate(['/login']);
-      return throwError(() => refreshError);
+      return throwError(() => err);
     })
   );
+}
+
+function retryRequest(
+  req: HttpRequest<unknown>,
+  token: string,
+  next: HttpHandlerFn
+): Observable<HttpEvent<unknown>> {
+  const newRequest = req.clone({
+    setHeaders: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  return next(newRequest);
 }

@@ -1,0 +1,80 @@
+<section class="profile-container">
+    <div class="profile-header">
+        <div class="profile-image-container">
+            @if (!currentUser()?.profile_image) {
+                <label class="image-upload-label">
+                    <div class="default-content">
+                        <img src="/icons/User.svg" alt="Usuario" class="default-user-icon">
+                    </div>
+                    <div class="hover-content">
+                        <img src="/icons/Edit.svg" alt="Editar" class="edit-icon">
+                        <span class="choose-text">Elegir imagen</span>
+                    </div>
+                    <input type="file" 
+                           accept="image/*" 
+                           (change)="onFirstImageUpload($event)"
+                           class="image-upload-input">
+                </label>
+            } @else {
+                <!-- Contenedor mejorado para la imagen existente -->
+                <div class="image-container" (click)="openEditModal()">
+                    <img [src]="currentUser()?.profile_image" 
+                         alt="Foto de perfil" 
+                         class="profile-image">
+                    <div class="image-change-overlay">
+                        <img src="/icons/Edit.svg" alt="Editar" class="edit-icon">
+                        <span class="change-text">Cambiar</span>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="profile-info">
+            <span class="profile-label">Perfil</span>
+            <h1 class="profile-name">
+                {{ currentUser()?.first_name }} {{ currentUser()?.last_name }}
+            </h1>
+            <span class="playlists-count">{{ userPlaylists().length }} playlist públicas</span>
+        </div>
+    </div>
+    <div class="profile-actions">
+        <button (click)="openOptionsMenu($event)" class="options-button">
+            <img src="/icons/Options.svg" alt="Opciones">
+        </button>
+    </div>
+    <div class="playlists-section">
+        <h2 class="playlist-title">Playlist Creadas</h2>     
+        @if (apiError()) {
+            <div class="error-message">
+                {{ apiError() }}
+            </div>
+        }     
+        <div class="playlists-grid">
+            @for (playlist of userPlaylists(); track playlist.id) {
+                <app-card-play-list 
+                    [playlist]="playlist"
+                    (cardClick)="onCardClick($event)">
+                </app-card-play-list>
+            } @empty {
+                @if (!apiError()) {
+                    <p class="empty-message">No hay playlists creadas</p>
+                }
+            }
+        </div>
+    </div>
+     @if (showOptionsMenu) {
+        <app-perfil-options 
+            [position]="optionsMenuPosition"
+            (close)="closeModals()"
+            (editSelected)="handleEditProfile()"
+        >
+        </app-perfil-options>
+    }
+    
+    @if (showEditModal) {
+        <app-edit-perfil
+            [userData]="currentUser()"
+            (close)="closeModals()"
+        >
+        </app-edit-perfil>
+    }
+</section>

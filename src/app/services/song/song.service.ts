@@ -10,7 +10,7 @@ import { SearchService } from '../search/seach.service';
   providedIn: 'root'
 })
 export class SongService {
- private apiUrl = `${environment.apiUrl}/songs`;
+  private apiUrl = `${environment.apiUrl}/songs`;
   private http = inject(HttpClient);
   private searchService = inject(SearchService);
 

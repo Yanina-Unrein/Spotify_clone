@@ -1,0 +1,30 @@
+<div class="modal-backdrop" (click)="close.emit()">
+    <div class="modal-content" 
+         [style.left.px]="position?.x"
+         [style.top.px]="position?.y"
+         (click)="$event.stopPropagation()">
+        <div class="option-item" (click)="editSelected.emit()">
+          <img src="/icons/Edit.svg" alt="icon Editar"> Editar perfil
+        </div>
+        <div class="option-item delete" (click)="onDeleteAccount()">
+          <img src="/icons/Trash.svg" alt="icon Eliminar"> Eliminar cuenta
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación -->
+<app-modal-message 
+    [visible]="showDeleteModal"
+    [title]="modalTitle"
+    [message]="modalMessage"
+    (confirm)="handleConfirmDelete()"
+    (cancel)="handleCancelDelete()">
+</app-modal-message>
+
+<!-- Alertas personalizadas -->
+@if (showAlert) {
+  <div class="alert" [class.success]="alertType === 'success'" [class.error]="alertType === 'error'">
+      {{ alertMessage }}
+      <button class="close-btn" (click)="showAlert = false">×</button>
+  </div>
+}

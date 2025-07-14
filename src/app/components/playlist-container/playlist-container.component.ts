@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, EventEmitter, inject, Output, signal } from '@angular/core';
-import { CardPlayListComponent } from '../card-play-list/card-play-list.component';
-import { GreetingComponent } from "../greeting/greeting.component";
-import { CardArtistComponent } from "../card-artist/card-artist.component";
+
+import { GreetingComponent } from "../shared/greeting/greeting.component";
+
 import { Artist } from '@/app/models/ArtistModel';
 import { ArtistService } from '@/app/services/artist/artist.service';
 import { PlaylistService } from '@/app/services/playlist/playlist.service';
@@ -10,6 +10,8 @@ import { AuthService } from '@/app/services/auth/auth.service';
 import { Playlist } from '@/app/models/PlaylistModel';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { catchError, forkJoin, of, Subject, takeUntil } from 'rxjs';
+import { CardPlayListComponent } from '../cards/card-play-list/card-play-list.component';
+import { CardArtistComponent } from '../cards/card-artist/card-artist.component';
 
 @Component({
   selector: 'app-playlist-container',

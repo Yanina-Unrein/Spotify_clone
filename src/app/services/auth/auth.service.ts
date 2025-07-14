@@ -5,15 +5,13 @@ import { environment } from '@/environments/environment';
 import { 
   User, 
   AuthResponse, 
-  PasswordResetRequest, 
   PasswordResetResponse,
-  TokenValidationResponse,
-  ResetPasswordData
+  TokenValidationResponse
 } from '@/app/models/UserModel';
-import { catchError, tap, throwError, of, Observable } from 'rxjs';
+import { catchError, tap, throwError, of, Observable, BehaviorSubject } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
-import { ApiError, FieldError, RegisterData, RegisterResponse } from '@/app/models/Register';
+import { FieldError, RegisterData } from '@/app/models/Register';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +21,8 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
+  private refreshTokenInProgress = false;
+  private tokenRefreshSubject: BehaviorSubject<any> | null = null;
 
   private _currentUser = signal<User | null>(null);
   currentUser = this._currentUser.asReadonly();
@@ -41,9 +41,9 @@ export class AuthService {
     }
   }
 
-  register(userData: RegisterData): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(`${this.apiUrl}/registrarse`, userData).pipe(
-      tap((response: RegisterResponse) => this.handleAuthentication(response)),
+  register(userData: RegisterData): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/registrarse`, userData).pipe(
+      tap((response: AuthResponse) => this.handleAuthentication(response)),
       catchError((error: HttpErrorResponse) => this.handleRegisterError(error)) 
     );
   }
@@ -57,19 +57,22 @@ export class AuthService {
 
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('currentUser');
+      localStorage.clear();
+      sessionStorage.clear();
     }
+    
     this._currentUser.set(null);
-    this.router.navigate(['/login']);
+
+    this.router.navigate(['/']).then(() => {
+      window.location.reload();
+    });
   }
 
   checkEmailExists(email: string): Observable<{ exists: boolean }> {
-    console.log('🔍 Verificando email:', email); // Log para debug
     return this.http.post<{ exists: boolean }>(`${this.apiUrl}/check-email`, { email }).pipe(
-      tap(response => console.log('📊 Respuesta del servidor:', response)), // Log para debug
+      tap(response => console.log('Respuesta del servidor:', response)), // Log para debug
       catchError((error) => {
-        console.error('❌ Error checking email:', error);
+        console.error('Error checking email:', error);
         return of({ exists: false }); // Si hay error, asumimos que no existe
       })
     );
@@ -77,10 +80,13 @@ export class AuthService {
 
   private handleAuthentication(response: AuthResponse): void {
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem('token', response.token);
+      // Usar el método público para establecer tokens
+      this.setTokens(response.token, response.refreshToken);
+      
+      // Actualizar el usuario
+      this._currentUser.set(response.user);
       localStorage.setItem('currentUser', JSON.stringify(response.user));
     }
-    this._currentUser.set(response.user);
   }
 
   requestPasswordReset(email: string) {
@@ -144,12 +150,11 @@ export class AuthService {
           status: error.status,
           fieldErrors: [{ field: 'email', message: 'Esta dirección ya está vinculada a una cuenta' }],
           rawError: error,
-          isEmailExists: true // Nueva propiedad para identificar este error específico
+          isEmailExists: true 
         }));
       }
     }
 
-    // Manejo genérico de otros errores
     if (error.error) {
       if (typeof error.error === 'string') {
         errorMessage = error.error;
@@ -159,7 +164,6 @@ export class AuthService {
         errorMessage = error.error.error;
       }
 
-      // Procesar errores de validación
       if (error.error.errors) {
         Object.entries(error.error.errors).forEach(([field, messages]) => {
           fieldErrors.push({
@@ -179,35 +183,138 @@ export class AuthService {
   }
 
   getToken(): string | null {
-  if (isPlatformBrowser(this.platformId)) {
-    return localStorage.getItem('token');
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem('token');
+    }
+    return null;
   }
-  return null;
-}
 
-// Método para verificar si el token está expirado
-isTokenExpired(): boolean {
-  const token = this.getToken();
-  if (!token) return true;
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
 
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.exp < Date.now() / 1000;
-  } catch (e) {
-    return true;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp < Date.now() / 1000;
+    } catch (e) {
+      return true;
+    }
   }
-}
 
-// Método para refrescar el token si es necesario
-refreshToken(): Observable<AuthResponse> {
-  return this.http.post<AuthResponse>(`${this.apiUrl}/refresh-token`, {}).pipe(
-    tap(response => this.handleAuthentication(response)),
-    catchError(error => {
+  isRefreshingToken(): boolean {
+    return this.refreshTokenInProgress && this.tokenRefreshSubject !== null;
+  }
+
+  refreshToken(): Observable<{ token: string, refreshToken: string }> {
+    if (this.tokenRefreshSubject) {
+      return this.tokenRefreshSubject.asObservable();
+    }
+    
+    this.refreshTokenInProgress = true;
+    this.tokenRefreshSubject = new BehaviorSubject<any>(null);
+    
+    const refreshToken = localStorage.getItem('refresh_token');
+    
+    if (!refreshToken) {
       this.logout();
-      return throwError(() => error);
-    })
-  );
-}
+      return throwError(() => new Error('No hay token de refresco disponible'));
+    }
+    
+    return this.http.post<{ token: string, refreshToken: string }>(
+      `${this.apiUrl}/refresh-token`,
+      { refreshToken }
+    ).pipe(
+      tap(tokens => {
+        // Método público para establecer tokens
+        this.setTokens(tokens.token, tokens.refreshToken);
+        this.refreshTokenInProgress = false;
+        this.tokenRefreshSubject?.next(tokens);
+        this.tokenRefreshSubject = null;
+      }),
+      catchError(error => {
+        this.refreshTokenInProgress = false;
+        this.tokenRefreshSubject = null;
+        this.logout();
+        return throwError(() => error);
+      })
+    );
+  }
+
+  public refreshUserData(): void {
+    this.loadUserFromStorage();
+  }
+
+  public setTokens(token: string, refreshToken: string) {
+    if (token && token.includes('.')) { 
+      localStorage.setItem('token', token);
+      localStorage.setItem('refresh_token', refreshToken);
+      this.loadUserFromToken(token);
+      
+      // Forzar recarga de datos del usuario
+      setTimeout(() => {
+        this.refreshUserData();
+      }, 1000);
+    } else {
+      console.warn('Token inválido, no se guardó');
+    }
+  }
+
+  private loadUserFromToken(token: string) {
+    try {
+      if (!token || !token.includes('.')) throw new Error('Token inválido');
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      
+      // Crear objeto con datos del token
+      const tokenData: Partial<User> = {
+        id: payload.id,
+        email: payload.email,
+        first_name: payload.first_name,
+        last_name: payload.last_name,
+        profile_image: payload.profile_image,
+        username: payload.username,
+        role: payload.role,
+        created_at: payload.created_at
+      };
+      
+      // Combinar con usuario existente
+      const currentUser = this._currentUser() || {};
+      const mergedUser = { ...currentUser, ...tokenData };
+      
+      this._currentUser.set(mergedUser as User);
+      
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('currentUser', JSON.stringify(mergedUser));
+      }
+    } catch (e) {
+      console.error('Error parsing token', e);
+      localStorage.removeItem('token');
+      localStorage.removeItem('refresh_token');
+    }
+  }
+
+  public loadUserFromStorage() {
+    if (isPlatformBrowser(this.platformId)) {
+      const savedUser = localStorage.getItem('currentUser');
+      if (savedUser) {
+        try {
+          const parsedUser = JSON.parse(savedUser);
+          
+          this._currentUser.set({
+            id: parsedUser.id,
+            email: parsedUser.email,
+            first_name: parsedUser.first_name,
+            last_name: parsedUser.last_name,
+            profile_image: parsedUser.profile_image || null,
+            username: parsedUser.username,
+            created_at: parsedUser.created_at
+          } as User);
+        } catch (e) {
+          console.error('Error parsing saved user', e);
+          this.logout();
+        }
+      }
+    }
+  }
 
   // Método para obtener los headers de autenticación
   getAuthHeaders(): { headers: HttpHeaders } {
@@ -218,5 +325,29 @@ refreshToken(): Observable<AuthResponse> {
         'Content-Type': 'application/json'
       })
     };
+  }
+
+  updateUserProfile(updatedUser: User): void {
+    // Guardar en localStorage primero
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    }
+    
+    // Actualizar la señal DESPUÉS de localStorage
+    this._currentUser.set(updatedUser);
+  }
+  
+  updateUserProfileImage(imageUrl: string | null): void {
+    const current = this._currentUser();
+    if (current) {
+      this._currentUser.set({ 
+        ...current, 
+        profile_image: imageUrl 
+      });
+      
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('currentUser', JSON.stringify(this._currentUser()));
+      }
+    }
   }
 }

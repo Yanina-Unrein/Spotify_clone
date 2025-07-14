@@ -1,9 +1,9 @@
 import { PlayableSong, Song } from '@/app/models/SongModel';
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, Input } from '@angular/core';
-import { ButtonPlaySmallComponent } from "../../button-play-small/button-play-small.component";
-import { SongActionsMenuComponent } from '../../song-actions-menu/song-actions-menu.component';
 import { AuthService } from '@/app/services/auth/auth.service';
+import { ButtonPlaySmallComponent } from '../../buttons/button-play-small/button-play-small.component';
+import { SongActionsMenuComponent } from '../../menus/song-actions-menu/song-actions-menu.component';
 
 
 @Component({

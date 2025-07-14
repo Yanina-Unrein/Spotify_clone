@@ -1,0 +1,226 @@
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h2>Detalles del perfil</h2>
+    @if (generalError) {
+      <div class="general-error">
+        {{ generalError }}
+      </div>
+    }
+    <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
+      <div class="form-section">
+        <div class="form-group image-upload-group">
+          <label>Imagen de perfil</label>
+            <div class="profile-image-container"
+                (mouseenter)="hovered = true"
+                (mouseleave)="hovered = false">
+              
+              @if (editForm.get('profile_image')?.value) {
+                <div class="image-wrapper">
+                  <img [src]="editForm.get('profile_image')?.value" 
+                      alt="Foto de perfil" 
+                      class="profile-image">
+                </div>
+              } @else {
+                <div class="default-content">
+                  <img src="/icons/User.svg" alt="Usuario" class="default-user-icon">
+                </div>
+              }              
+              @if (hovered) {
+                <div class="image-actions-overlay">
+                   <div class="actions-container">
+                      <div class="action-top">
+                        <div class="action-item" (click)="triggerFileInput()">
+                          <span class="action-text">Cambiar imagen</span>
+                        </div>
+                      </div>
+                      <div class="action-center" (click)="triggerFileInput()">
+                        <img src="/icons/Edit.svg" alt="Editar" class="edit-icon">
+                      </div>
+                      <div class="action-bottom">
+                        <div class="action-item" (click)="removeProfileImage()">
+                          <span class="action-text">Eliminar</span>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+              }
+              <input type="file" 
+                    accept="image/*" 
+                    (change)="onFileChange($event)"
+                    class="image-upload-input"
+                    #fileInput>
+            </div>
+        </div>
+        <div>
+          <div class="form-group">
+            <label for="first_name">Nombre</label>
+            <input id="first_name" 
+                  formControlName="first_name" 
+                  type="text"
+                  (keypress)="onKeyPress($event, 'first_name')">
+            
+            @if (getFirstNameErrors()) {
+              <span class="error-message">{{ getFirstNameErrors() }}</span>
+            }     
+            @if (firstNameUpdated) {
+              <span class="success-message">¡Nombre actualizado con éxito!</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="last_name">Apellido</label>
+            <input id="last_name" 
+                  formControlName="last_name" 
+                  type="text"
+                  (keypress)="onKeyPress($event, 'last_name')">           
+            @if (getLastNameErrors()) {
+              <span class="error-message">{{ getLastNameErrors() }}</span>
+            }
+            @if (lastNameUpdated) {
+              <span class="success-message">¡Apellido actualizado con éxito!</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" formControlName="email" type="email">            
+            @if (getEmailErrors()) {
+              <span class="error-message">{{ getEmailErrors() }}</span>
+            }    
+            @if (emailUpdated) {
+              <span class="success-message">¡Email actualizado con éxito!</span>
+            }
+            @if (generalError && editForm.get('email')?.dirty) {
+              <span class="error-message">{{ generalError }}</span>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="password-section">
+        <button type="button" class="toggle-password-btn" (click)="togglePasswordFields()">
+          {{ showPasswordFields ? 'Ocultar' : 'Cambiar contraseña' }}
+        </button>
+        @if (showPasswordFields) {
+           <div>
+              @if (passwordSuccess) {
+                <div class="success-message">
+                  {{ passwordSuccess }}
+                </div>
+              }
+              
+              @if (passwordError) {
+                <div class="error-message">
+                  {{ passwordError }}
+                </div>
+              }
+            </div>
+          <div class="password-fields">
+            <!-- Campo de contraseña actual -->
+            <div class="form-group">
+              <label for="current_password" class="form-label">Contraseña actual</label>
+              <div class="password-container">
+                <input
+                  id="current_password"
+                  formControlName="current_password"
+                  [type]="currentPasswordVisible ? 'text' : 'password'"
+                  class="form-control"
+                  [class.is-invalid]="editForm.get('current_password')?.invalid && editForm.get('current_password')?.touched"
+                />
+                <button
+                  type="button"
+                  class="eye-btn"
+                  (click)="toggleCurrentPasswordVisibility()"
+                  aria-label="Mostrar u ocultar contraseña"
+                >
+                  <img *ngIf="currentPasswordVisible" src="/icons/eye-off.svg" alt="Ocultar contraseña" />
+                  <img *ngIf="!currentPasswordVisible" src="/icons/eye-show.svg" alt="Mostrar contraseña" />
+                </button>
+              </div>
+              @if (editForm.get('current_password')?.invalid && editForm.get('current_password')?.touched) {
+                <div class="invalid-feedback">
+                  Por favor ingresa tu contraseña actual
+                </div>
+              }
+            </div>
+            <div class="form-group">
+              <label for="new_password" class="form-label">Nueva contraseña</label>
+              <div class="password-container">
+                <input
+                  id="new_password"
+                  formControlName="new_password"
+                  [type]="newPasswordVisible ? 'text' : 'password'"
+                  class="form-control"
+                  [class.is-invalid]="editForm.get('new_password')?.invalid && editForm.get('new_password')?.touched"
+                />
+                <button
+                  type="button"
+                  class="eye-btn"
+                  (click)="toggleNewPasswordVisibility()"
+                  aria-label="Mostrar u ocultar contraseña"
+                >
+                  <img *ngIf="newPasswordVisible" src="/icons/eye-off.svg" alt="Ocultar contraseña" />
+                  <img *ngIf="!newPasswordVisible" src="/icons/eye-show.svg" alt="Mostrar contraseña" />
+                </button>
+              </div>
+              @if (editForm.get('new_password')?.invalid && editForm.get('new_password')?.touched) {
+                <div class="invalid-feedback">
+                  <p>La contraseña debe contener al menos:<br>
+                  - 1 letra,<br>
+                  - 1 número o carácter especial (por ejemplo, "#", "?", "!" o "&"),<br>
+                  - 10 caracteres</p>
+                </div>
+              }
+            </div>
+            <div class="form-group">
+              <label for="confirm_password" class="form-label">Confirmar nueva contraseña</label>
+              <div class="password-container">
+                <input
+                  id="confirm_password"
+                  formControlName="confirm_password"
+                  [type]="confirmPasswordVisible ? 'text' : 'password'"
+                  class="form-control"
+                  [class.is-invalid]="editForm.get('confirm_password')?.errors?.['mismatch'] && editForm.get('confirm_password')?.touched"
+                />
+                <button
+                  type="button"
+                  class="eye-btn"
+                  (click)="toggleConfirmPasswordVisibility()"
+                  aria-label="Mostrar u ocultar contraseña"
+                >
+                  <img *ngIf="confirmPasswordVisible" src="/icons/eye-off.svg" alt="Ocultar contraseña" />
+                  <img *ngIf="!confirmPasswordVisible" src="/icons/eye-show.svg" alt="Mostrar contraseña" />
+                </button>
+              </div>
+              @if (editForm.get('confirm_password')?.hasError('mismatch')) {
+                <div class="invalid-feedback">
+                  Las contraseñas no coinciden
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+       <div class="form-actions">
+        <button type="button" class="cancel-button" (click)="close.emit()" [disabled]="isSaving">
+          Cancelar
+        </button>
+        <button type="submit" class="save-button" [disabled]="isSaving">
+          @if (isSaving) {
+            <span>Guardando...</span>
+          } @else {
+            <span>Guardar cambios</span>
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<app-modal-message 
+    *ngIf="showConfirmModal"
+    [visible]="showConfirmModal"
+    [title]="confirmModalTitle"
+    [message]="confirmModalMessage"
+    (confirm)="onConfirmRemoveImage()"
+    (cancel)="onCancelRemoveImage()">
+</app-modal-message>
